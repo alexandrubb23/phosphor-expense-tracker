@@ -1,22 +1,17 @@
 import express from "express";
 import cors from "cors";
+import { env } from "./env.js";
 import healthRouter from "./routes/health.js";
 
 const app = express();
-const PORT = process.env.PORT ?? 3000;
 
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL ?? "http://localhost:5173",
-    credentials: true,
-  })
-);
+app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 app.use(express.json());
 
 app.use("/api/health", healthRouter);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(env.PORT, () => {
+  console.log(`Server running on http://localhost:${env.PORT}`);
 });
 
 export default app;
