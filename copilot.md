@@ -12,19 +12,35 @@ AlexB/                        ← monorepo root (Bun workspaces)
 │   ├── src/
 │   │   ├── types.ts          ← shared Transaction type, CATEGORIES const
 │   │   ├── categoryColors.ts ← CATEGORY_COLORS map
-│   │   ├── App.tsx
-│   │   └── components/
-│   │       ├── Clock.tsx
-│   │       ├── Summary.tsx
-│   │       ├── SpendingByCategory.tsx
-│   │       ├── TransactionForm.tsx
-│   │       ├── TransactionList.tsx
-│   │       └── HealthStatus.tsx   ← polls GET /api/health every 30 s
+│   │   ├── App.tsx           ← router only (Routes + Route declarations)
+│   │   ├── pages/            ← one file per route
+│   │   │   ├── HomePage.tsx
+│   │   │   └── LoginPage.tsx
+│   │   ├── components/       ← organised by domain
+│   │   │   ├── auth/         ← session, access control
+│   │   │   │   ├── ProtectedRoute.tsx
+│   │   │   │   └── SignOutButton.tsx
+│   │   │   ├── transactions/ ← transaction-domain UI
+│   │   │   │   ├── Summary.tsx
+│   │   │   │   ├── SpendingByCategory.tsx
+│   │   │   │   ├── TransactionForm.tsx
+│   │   │   │   └── TransactionList.tsx
+│   │   │   └── ui/           ← generic, domain-agnostic UI
+│   │   │       ├── Clock.tsx
+│   │   │       ├── Masthead.tsx
+│   │   │       ├── SectionHead.tsx
+│   │   │       └── HealthStatus.tsx  ← polls GET /api/health every 30 s
+│   │   └── lib/
+│   │       └── auth-client.ts ← Better Auth React client (signIn, signOut, useSession)
 │   └── vite.config.ts        ← proxies /api → localhost:3000
 ├── backend/                  ← Express 5 + TypeScript, run with Bun (port 3000)
 │   └── src/
 │       ├── index.ts          ← app entry, CORS, JSON middleware
+│       ├── lib/
+│       │   ├── auth.ts       ← Better Auth server config
+│       │   └── prisma.ts     ← Prisma client singleton
 │       └── routes/
+│           ├── auth.ts       ← Better Auth handler mounted at /api/auth/**
 │           └── health.ts     ← GET /api/health → { status, timestamp }
 └── expense-tracker/          ← original JSX prototype — keep for reference only
 ```
@@ -60,6 +76,15 @@ bun run --filter frontend build    # production build
 - Use database-persisted sessions (Better Auth). Never use JWTs.
 - Soft-delete transactions (set `deleted_at`), never hard-delete.
 - Single currency for v1: **RON**.
+
+## Frontend component organisation
+Components live under `frontend/src/components/` and are organised by domain:
+- `auth/` — authentication and access control (e.g. `ProtectedRoute`, `SignOutButton`)
+- `transactions/` — transaction-domain UI (e.g. `Summary`, `TransactionForm`)
+- `ui/` — generic, domain-agnostic primitives (e.g. `Masthead`, `SectionHead`, `Clock`)
+
+When creating a new component, place it in the folder matching its domain. If it could belong to multiple domains, prefer `ui/`.  
+Route-level components go in `frontend/src/pages/` (one file per route).
 
 ## Error handling
 Never call `res.status(...).json(...)` directly in route handlers or middleware.

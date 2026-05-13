@@ -1,5 +1,5 @@
-import { Transaction } from "../types";
-import { useCountUp } from "../hooks/useCountUp";
+import { Transaction } from "../../types";
+import { useCountUp } from "../../hooks/useCountUp";
 
 interface SummaryProps {
   transactions: Transaction[];
