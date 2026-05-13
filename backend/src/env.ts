@@ -12,6 +12,8 @@ export const env = createEnv({
     DATABASE_URL: z.url(),
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.url(),
+    SEED_ADMIN_EMAIL: z.email(),
+    SEED_ADMIN_PASSWORD: z.string().min(8),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
