@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/categorycolors.ts","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/components/clock.tsx","./src/components/healthstatus.tsx","./src/components/spendingbycategory.tsx","./src/components/summary.tsx","./src/components/transactionform.tsx","./src/components/transactionlist.tsx"],"version":"5.9.3"}

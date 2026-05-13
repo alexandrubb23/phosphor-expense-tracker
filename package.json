@@ -1,0 +1,11 @@
+{
+  "name": "alexb",
+  "private": true,
+  "version": "0.0.0",
+  "workspaces": ["frontend", "backend"],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "build": "bun run --filter frontend build",
+    "lint": "bun run --filter '*' lint"
+  }
+}

@@ -1,0 +1,83 @@
+import {
+  BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer,
+} from 'recharts'
+import { CATEGORY_COLORS, CATEGORY_COLOR_FALLBACK } from '../categoryColors'
+import { Transaction } from '../types'
+
+interface SpendingByCategoryProps {
+  transactions: Transaction[]
+}
+
+interface ChartEntry {
+  name: string
+  value: number
+}
+
+interface TooltipPayloadItem {
+  value: number
+  payload: ChartEntry
+}
+
+function CustomTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayloadItem[] }) {
+  if (!active || !payload?.length) return null
+  const entry = payload[0]
+  return (
+    <div className="chart-tooltip">
+      <div className="chart-tooltip-label">▸ {entry.payload.name}</div>
+      <div className="chart-tooltip-value">${entry.value.toLocaleString()}</div>
+    </div>
+  )
+}
+
+function SpendingByCategory({ transactions }: SpendingByCategoryProps) {
+  const totalsByCategory = transactions
+    .filter(t => t.type === 'expense')
+    .reduce<Record<string, number>>((acc, t) => {
+      acc[t.category] = (acc[t.category] ?? 0) + t.amount
+      return acc
+    }, {})
+
+  const data: ChartEntry[] = Object.entries(totalsByCategory)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+
+  return (
+    <div className="chart-card">
+      {data.length === 0 ? (
+        <p className="chart-empty">NO SIGNAL · STANDBY</p>
+      ) : (
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart data={data} margin={{ top: 20, right: 12, left: 0, bottom: 8 }} barCategoryGap="32%">
+            <CartesianGrid vertical={false} stroke="#1a2535" strokeDasharray="2 6" />
+            <XAxis
+              dataKey="name"
+              axisLine={{ stroke: '#2a4055', strokeWidth: 1 }}
+              tickLine={false}
+              tick={{ dy: 12 }}
+              tickFormatter={(v: string) => v.toUpperCase()}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ dx: -4 }}
+              tickFormatter={(v: number) => `$${v}`}
+              width={60}
+            />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0, 229, 255, 0.05)' }} />
+            <Bar dataKey="value" radius={[0, 0, 0, 0]} maxBarSize={64}>
+              {data.map((entry, index) => (
+                <Cell
+                  key={entry.name}
+                  fill={CATEGORY_COLORS[entry.name] ?? CATEGORY_COLOR_FALLBACK[index % CATEGORY_COLOR_FALLBACK.length]}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+  )
+}
+
+export default SpendingByCategory
