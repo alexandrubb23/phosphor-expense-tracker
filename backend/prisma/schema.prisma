@@ -1,0 +1,12 @@
+// Schema is built incrementally as features are implemented.
+// Run `bunx prisma migrate dev --name <feature>` after each addition.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
