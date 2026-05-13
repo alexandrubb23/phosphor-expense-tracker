@@ -61,6 +61,37 @@ bun run --filter frontend build    # production build
 - Soft-delete transactions (set `deleted_at`), never hard-delete.
 - Single currency for v1: **RON**.
 
+## Error handling
+Never call `res.status(...).json(...)` directly in route handlers or middleware.
+Always throw (or `next()`) an `HttpError` subclass — the global `errorHandler` middleware (mounted last in `index.ts`) handles the response uniformly.
+
+```ts
+// ✅ correct
+import { HttpNotFoundError, HttpUnauthorizedError } from "../lib/http-errors";
+
+throw new HttpNotFoundError("Transaction not found");
+throw new HttpUnauthorizedError();
+
+// In middleware, forward via next():
+return next(new HttpUnauthorizedError());
+
+// ❌ wrong — never do this
+res.status(404).json({ error: "Not found" });
+```
+
+Available error classes (`backend/src/lib/http-errors.ts`):
+| Class | Status |
+|---|---|
+| `HttpBadRequestError` | 400 |
+| `HttpUnauthorizedError` | 401 |
+| `HttpForbiddenError` | 403 |
+| `HttpNotFoundError` | 404 |
+| `HttpConflictError` | 409 |
+| `HttpPayloadTooLargeError` | 413 |
+| `HttpUnprocessableError` | 422 |
+
+Add new subclasses to `http-errors.ts` as needed. Unknown errors fall through to a generic 500 response.
+
 ## Domain model (planned, Prisma not yet added)
 - **User** — owns everything; no cross-user data access.
 - **Account** — a wallet/bank account belonging to a user.

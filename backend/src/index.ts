@@ -3,6 +3,7 @@ import cors from "cors";
 import { env } from "./env.js";
 import { authHandler } from "./routes/auth.js";
 import healthRouter from "./routes/health.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
@@ -14,6 +15,8 @@ app.all("/api/auth/{*splat}", authHandler);
 app.use(express.json());
 
 app.use("/api/health", healthRouter);
+
+app.use(errorHandler);
 
 app.listen(env.PORT, () => {
   console.log(`Server running on http://localhost:${env.PORT}`);

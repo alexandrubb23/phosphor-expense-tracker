@@ -1,10 +1,11 @@
 import type { Request, Response, NextFunction } from "express";
 import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "../lib/auth.js";
+import { HttpUnauthorizedError } from "../lib/http-errors.js";
 
 export async function requireAuth(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> {
   const session = await auth.api.getSession({
@@ -12,8 +13,7 @@ export async function requireAuth(
   });
 
   if (!session) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
+    return next(new HttpUnauthorizedError());
   }
 
   req.user = session.user;
