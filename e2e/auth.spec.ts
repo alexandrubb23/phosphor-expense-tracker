@@ -175,7 +175,7 @@ test.describe("Authentication", () => {
     test("can access /users", async ({ adminPage: page }) => {
       await gotoUsersPage(page);
       await expect(page).toHaveURL("/users");
-      await expect(page.getByText("ADMIN ONLY")).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Users" })).toBeVisible();
     });
 
     test("sees the USERS nav link", async ({ adminPage: page }) => {

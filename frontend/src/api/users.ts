@@ -44,7 +44,7 @@ class UsersApi extends Http {
   }
 
   async deleteUser(id: string): Promise<void> {
-    this.http.delete(`${this.path}/${id}`);
+    await this.http.delete(`${this.path}/${id}`);
   }
 }
 
