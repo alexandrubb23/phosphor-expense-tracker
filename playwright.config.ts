@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
+  outputDir: "./e2e/test-results",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -25,13 +26,13 @@ export default defineConfig({
       url: "http://localhost:3000/api/health",
       cwd: "./backend",
       env: { NODE_ENV: "test" },
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: false,
     },
     {
       command: "bun run dev",
       url: "http://localhost:5173",
       cwd: "./frontend",
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: false,
     },
   ],
 });
