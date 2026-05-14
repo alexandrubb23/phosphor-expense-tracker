@@ -13,6 +13,10 @@ AlexB/                        ← monorepo root (Bun workspaces)
 ├── e2e/                      ← Playwright E2E tests
 │   ├── global-setup.ts       ← runs `prisma migrate deploy` against test DB before suite
 │   └── global-teardown.ts    ← stub for post-suite cleanup
+├── core/                     ← shared TypeScript package (@expense-tracker/core) — no build step
+│   └── src/
+│       ├── index.ts          ← re-exports everything
+│       └── schemas/          ← Zod schemas shared between frontend and backend
 ├── frontend/                 ← Vite + React + TypeScript (port 5173)
 │   ├── src/
 │   │   ├── types.ts          ← shared Transaction type, CATEGORIES const
@@ -106,6 +110,16 @@ cd frontend && npm run test:watch  # component tests in watch mode
 - Use database-persisted sessions (Better Auth). Never use JWTs.
 - Soft-delete transactions (set `deleted_at`), never hard-delete.
 - Single currency for v1: **RON**.
+
+## Shared code (`@expense-tracker/core`)
+Any logic that must be identical on both client and server (e.g. validation schemas) lives in the `core/` workspace package.
+
+- **Package name**: `@expense-tracker/core` — imported as `import { ... } from "@expense-tracker/core"`
+- **Zod schemas**: define in `core/src/schemas/<domain>.ts`, export from `core/src/index.ts`
+- Re-export inferred types alongside the schema: `export type CreateUserFields = z.infer<typeof createUserSchema>`
+- Both `frontend` and `backend` list `"@expense-tracker/core": "*"` in their `dependencies`
+- No build step — both workspaces import TypeScript source directly (bundler module resolution)
+- Do **not** duplicate a schema in `frontend/` or `backend/` if it already exists in `core/`
 
 ## Frontend component organisation
 Components live under `frontend/src/components/` and are organised by domain:
@@ -363,6 +377,7 @@ Use `as unknown as ReturnType<typeof useHook>` (double cast) when the partial mo
 - **`useIsAdmin()`** (`src/hooks/useIsAdmin.ts`) — the single source of truth for admin checks on the frontend.
 - `session.user.role` is properly typed via `inferAdditionalFields` in `auth-client.ts` — no type casts needed.
 - To create users, run the seed script or use the inline pattern from `backend/prisma/seed.ts` (hashing via `hashPassword` from `better-auth/crypto`).
+- Always use the `Role` enum from `backend/src/generated/prisma/client.js` when assigning roles in backend routes (e.g. `Role.admin`, `Role.user`). Never use raw string literals like `"admin"` or `"user"`.
 
 
 ### Adding auth to a new API route (backend)

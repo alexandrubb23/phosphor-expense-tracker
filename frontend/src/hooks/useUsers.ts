@@ -3,9 +3,11 @@ import { usersApi, type User } from "@/api/users";
 
 export type { User };
 
+export const usersQueryKey = ["admin", "users"] as const;
+
 export function useUsers() {
   return useQuery({
-    queryKey: ["admin", "users"],
+    queryKey: usersQueryKey,
     queryFn: () => usersApi.fetchUsers(),
   });
 }

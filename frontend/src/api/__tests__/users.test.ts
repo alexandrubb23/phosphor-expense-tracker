@@ -1,13 +1,14 @@
 import { vi } from "vitest";
 import axios from "axios";
-import type { User } from "@/api/users";
+import type { User, NewUser } from "@/api/users";
 
-// Hoist the mock get function so the vi.mock factory can reference it
+// Hoist the mock http methods so the vi.mock factory can reference them
 const mockGet = vi.hoisted(() => vi.fn());
+const mockPost = vi.hoisted(() => vi.fn());
 
 vi.mock("axios", () => ({
   default: {
-    create: vi.fn(() => ({ get: mockGet })),
+    create: vi.fn(() => ({ get: mockGet, post: mockPost })),
   },
 }));
 
@@ -35,6 +36,21 @@ const MOCK_USERS: User[] = [
     createdAt: "2025-03-20T08:30:00.000Z",
   },
 ];
+
+const NEW_USER: NewUser = {
+  name: "Charlie New",
+  email: "charlie@example.com",
+  password: "secret123",
+};
+
+const CREATED_USER: User = {
+  id: "ggg-hhh-iii-333333",
+  name: "Charlie New",
+  email: "charlie@example.com",
+  role: "user",
+  emailVerified: false,
+  createdAt: "2025-05-01T12:00:00.000Z",
+};
 
 describe("UsersApi", () => {
   afterEach(() => {
@@ -74,5 +90,33 @@ describe("UsersApi", () => {
     mockGet.mockRejectedValue(error);
 
     await expect(usersApi.fetchUsers()).rejects.toThrow("Network Error");
+  });
+
+  describe("createUser", () => {
+    const createUser = async () => {
+      mockPost.mockResolvedValue({ data: { user: CREATED_USER } });
+
+      await usersApi.createUser(NEW_USER);
+    };
+    it("calls POST /api/admin/users with the new user payload", async () => {
+      await createUser();
+
+      expect(mockPost).toHaveBeenCalledWith("/api/admin/users", NEW_USER);
+    });
+
+    it("returns the created user extracted from the response", async () => {
+      await createUser();
+
+      const result = await usersApi.createUser(NEW_USER);
+
+      expect(result).toEqual(CREATED_USER);
+    });
+
+    it("propagates errors thrown by axios", async () => {
+      const error = new Error("Conflict");
+      mockPost.mockRejectedValue(error);
+
+      await expect(usersApi.createUser(NEW_USER)).rejects.toThrow("Conflict");
+    });
   });
 });
