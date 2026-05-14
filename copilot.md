@@ -6,8 +6,13 @@ A full-stack personal finance app for logging income and expenses. Built primari
 ## Repository layout
 ```
 AlexB/                        ← monorepo root (Bun workspaces)
-├── package.json              ← workspace root, scripts: dev / build / lint
+├── package.json              ← workspace root, scripts: dev / build / lint / test:e2e
 ├── bun.lock
+├── playwright.config.ts      ← E2E test config (Chromium, webServer for both workspaces)
+├── tsconfig.json             ← root tsconfig for e2e/ and playwright.config.ts
+├── e2e/                      ← Playwright E2E tests
+│   ├── global-setup.ts       ← runs `prisma migrate deploy` against test DB before suite
+│   └── global-teardown.ts    ← stub for post-suite cleanup
 ├── frontend/                 ← Vite + React + TypeScript (port 5173)
 │   ├── src/
 │   │   ├── types.ts          ← shared Transaction type, CATEGORIES const
@@ -49,8 +54,9 @@ AlexB/                        ← monorepo root (Bun workspaces)
 ├── backend/                  ← Express 5 + TypeScript, run with Bun (port 3000)
 │   └── src/
 │       ├── index.ts          ← app entry, CORS, JSON middleware
+│       ├── env.ts            ← t3-env validation; loads `.env.test` when NODE_ENV=test
 │       ├── lib/
-│       │   ├── auth.ts       ← Better Auth server config
+│       │   ├── auth.ts       ← Better Auth server config; rateLimit only in production
 │       │   └── prisma.ts     ← Prisma client singleton
 │       └── routes/
 │           ├── auth.ts       ← Better Auth handler mounted at /api/auth/**
@@ -81,6 +87,10 @@ bun run --filter frontend dev      # Vite HMR on :5173
 bun run --filter backend dev       # Express with bun --watch on :3000
 bun run --filter frontend build    # production build
 cd frontend && npx tsc --noEmit    # type-check frontend
+bun run test:e2e                   # run Playwright E2E tests (headless Chromium)
+bun run test:e2e:ui                # Playwright interactive UI mode
+bun run test:e2e:headed            # run tests with visible browser
+bun run test:e2e:report            # open last HTML test report
 ```
 
 ## Key conventions
@@ -150,6 +160,18 @@ Available error classes (`backend/src/lib/http-errors.ts`):
 
 Add new subclasses to `http-errors.ts` as needed. Unknown errors fall through to a generic 500 response.
 
+## E2E testing (Playwright)
+- Tests live in `e2e/`. Run with `bun run test:e2e` from the monorepo root.
+- Browser: **Chromium only** (headless by default).
+- `playwright.config.ts` manages two `webServer` entries:
+  - **Backend** — started with `NODE_ENV=test`; loads `backend/.env.test` automatically.
+  - **Frontend** — standard `bun run dev` on `:5173`; Vite proxies `/api` to `:3000` as usual.
+- **Test database**: `expense-tracker-test` (PostgreSQL, same host/credentials as dev).  
+  `backend/.env.test` points `DATABASE_URL` at this database. File is gitignored; use `backend/.env.test.example` as a template.
+- **`e2e/global-setup.ts`**: runs `bunx prisma migrate deploy` against the test database before the test suite starts.
+- **`e2e/global-teardown.ts`**: stub — add cleanup logic (e.g. truncate tables) as needed.
+- Rate limiting is **disabled** in test (and dev) mode — only enabled in `production`.
+
 ## Authentication
 
 ### Strategy
@@ -159,6 +181,7 @@ Add new subclasses to `http-errors.ts` as needed. Unknown errors fall through to
 
 ### Backend
 - Better Auth server is configured in `backend/src/lib/auth.ts`.
+- Rate limiting is enabled **only in production** (`rateLimit.enabled: env.NODE_ENV === "production"`). Window: 60 s, max: 10 requests.
 - The handler is mounted in `backend/src/index.ts` **before** `express.json()` (Better Auth parses its own body):
   ```ts
   app.all("/api/auth/{*splat}", authHandler);
@@ -241,6 +264,7 @@ When writing or modifying code that touches any library in this project, **alway
 | Better Auth | `/better-auth/better-auth` |
 | Vercel AI SDK | `/vercel/ai` |
 | Recharts | `/recharts/recharts` |
+| Playwright | `/microsoft/playwright` |
 | TypeScript | `/microsoft/typescript` |
 
 ### How to use Context7
