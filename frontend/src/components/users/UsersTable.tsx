@@ -1,4 +1,4 @@
-import { Pencil } from "lucide-react";
+import { Role } from "@expense-tracker/core";
 import type { User } from "@/api/users";
 import {
   Table,
@@ -8,10 +8,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import EditButton from "@/components/ui/EditButton";
+import DeleteButton from "@/components/ui/DeleteButton";
 
 interface UsersTableProps {
   users: User[];
   onEdit: (user: User) => void;
+  onDelete: (user: User) => void;
 }
 
 function shortId(id: string) {
@@ -26,7 +29,11 @@ function formatDate(iso: string) {
   });
 }
 
-export default function UsersTable({ users, onEdit }: UsersTableProps) {
+export default function UsersTable({
+  users,
+  onEdit,
+  onDelete,
+}: UsersTableProps) {
   return (
     <Table className="border-collapse border border-hairline bg-panel">
       <TableHeader>
@@ -72,14 +79,14 @@ export default function UsersTable({ users, onEdit }: UsersTableProps) {
             <TableCell className="px-4.5 py-4">
               <span
                 className={`inline-flex items-center gap-1.5 border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em] ${
-                  user.role === "admin"
+                  user.role === Role.admin
                     ? "border-cyan-dim bg-surface text-cyan"
                     : "border-hairline bg-surface text-muted"
                 }`}
               >
                 <span
                   className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-                    user.role === "admin"
+                    user.role === Role.admin
                       ? "bg-cyan shadow-[0_0_6px_rgba(0,229,255,0.5)]"
                       : "bg-muted"
                   }`}
@@ -96,14 +103,14 @@ export default function UsersTable({ users, onEdit }: UsersTableProps) {
               {formatDate(user.createdAt)}
             </TableCell>
             <TableCell className="px-4.5 py-4 text-right">
-              <button
-                type="button"
-                onClick={() => onEdit(user)}
-                aria-label={`Edit ${user.name}`}
-                className="text-muted transition-colors duration-200 hover:text-cyan"
-              >
-                <Pencil size={14} />
-              </button>
+              <div className="flex items-center justify-end gap-3">
+                <EditButton label={user.name} onClick={() => onEdit(user)} />
+                <DeleteButton
+                  label={user.name}
+                  onClick={() => onDelete(user)}
+                  disabled={user.role === Role.admin}
+                />
+              </div>
             </TableCell>
           </TableRow>
         ))}

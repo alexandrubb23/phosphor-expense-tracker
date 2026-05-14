@@ -112,14 +112,15 @@ cd frontend && npm run test:watch  # component tests in watch mode
 - Single currency for v1: **RON**.
 
 ## Shared code (`@expense-tracker/core`)
-Any logic that must be identical on both client and server (e.g. validation schemas) lives in the `core/` workspace package.
+Any logic that must be identical on both client and server (e.g. validation schemas, enums) lives in the `core/` workspace package.
 
 - **Package name**: `@expense-tracker/core` — imported as `import { ... } from "@expense-tracker/core"`
 - **Zod schemas**: define in `core/src/schemas/<domain>.ts`, export from `core/src/index.ts`
+- **Enums**: define in `core/src/enums/<domain>.ts`, export from `core/src/index.ts`
 - Re-export inferred types alongside the schema: `export type CreateUserFields = z.infer<typeof createUserSchema>`
 - Both `frontend` and `backend` list `"@expense-tracker/core": "*"` in their `dependencies`
 - No build step — both workspaces import TypeScript source directly (bundler module resolution)
-- Do **not** duplicate a schema in `frontend/` or `backend/` if it already exists in `core/`
+- Do **not** duplicate a schema or enum in `frontend/` or `backend/` if it already exists in `core/`
 
 ## Frontend component organisation
 Components live under `frontend/src/components/` and are organised by domain:
@@ -372,12 +373,20 @@ Use `as unknown as ReturnType<typeof useHook>` (double cast) when the partial mo
 ```
 
 ### Role-based access control
-- Users have a `role` field (`"admin"` | `"user"`, default `"user"`).
+- Users have a `role` field (`Role.admin` | `Role.user`, default `Role.user`).
 - **`AdminRoute`** (`src/components/auth/AdminRoute.tsx`) — layout route that reads `useIsAdmin()` and redirects non-admins to `/`. Nest any admin-only route inside it in `App.tsx`.
 - **`useIsAdmin()`** (`src/hooks/useIsAdmin.ts`) — the single source of truth for admin checks on the frontend.
 - `session.user.role` is properly typed via `inferAdditionalFields` in `auth-client.ts` — no type casts needed.
 - To create users, run the seed script or use the inline pattern from `backend/prisma/seed.ts` (hashing via `hashPassword` from `better-auth/crypto`).
-- Always use the `Role` enum from `backend/src/generated/prisma/client.js` when assigning roles in backend routes (e.g. `Role.admin`, `Role.user`). Never use raw string literals like `"admin"` or `"user"`.
+- Always use the `Role` enum from **`@expense-tracker/core`** when comparing or assigning roles in both frontend and backend (e.g. `Role.admin`, `Role.user`). Never use raw string literals like `"admin"` or `"user"`.
+
+```ts
+// ✅ correct — import Role from core
+import { Role } from "@expense-tracker/core";
+
+role === Role.admin   // comparison
+role: Role.user       // assignment
+```
 
 
 ### Adding auth to a new API route (backend)

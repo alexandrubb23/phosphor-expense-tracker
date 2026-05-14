@@ -1,5 +1,5 @@
 import type { RequestHandler } from "express";
-import { Role } from "../generated/prisma/client.js";
+import { Role } from "@expense-tracker/core";
 import { HttpForbiddenError } from "../lib/http-errors.js";
 
 /**

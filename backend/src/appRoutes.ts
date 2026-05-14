@@ -4,7 +4,7 @@ import healthRouter from "./routes/health.js";
 import adminUsersRouter from "./routes/admin/users.js";
 import { requireAuth } from "./middleware/requireAuth.js";
 import { requireRole } from "./middleware/requireRole.js";
-import { Role } from "./generated/prisma/client.js";
+import { Role } from "@expense-tracker/core";
 
 export function appRoutes(app: Application): void {
   app.use("/api/health", healthRouter);

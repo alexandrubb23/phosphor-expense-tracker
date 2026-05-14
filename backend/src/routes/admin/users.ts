@@ -1,18 +1,21 @@
 import { Router } from "express";
 import { randomUUID } from "crypto";
 import { hashPassword } from "better-auth/crypto";
-import { createUserSchema, editUserSchema } from "@expense-tracker/core";
+import { createUserSchema, editUserSchema, Role } from "@expense-tracker/core";
 import { getPrisma } from "../../lib/prisma.js";
-import { Role } from "../../generated/prisma/client.js";
 import { validate } from "../../lib/validate.js";
-import { HttpConflictError, HttpNotFoundError } from "../../lib/http-errors.js";
+import {
+  HttpConflictError,
+  HttpForbiddenError,
+  HttpNotFoundError,
+} from "../../lib/http-errors.js";
 
 const router = Router();
+const prisma = getPrisma();
 
 router.get("/", async (_req, res) => {
-  const prisma = getPrisma();
-
-  const users = await prisma.user.findMany({
+  const users = await (prisma.user as any).findMany({
+    where: { deletedAt: null },
     select: {
       id: true,
       name: true,
@@ -30,7 +33,6 @@ router.get("/", async (_req, res) => {
 router.post("/", async (req, res) => {
   const { name, email, password } = validate(createUserSchema, req.body);
 
-  const prisma = getPrisma();
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     throw new HttpConflictError("A user with this email already exists");
@@ -73,8 +75,6 @@ router.post("/", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   const { id } = req.params;
   const { name, email, password } = validate(editUserSchema, req.body);
-
-  const prisma = getPrisma();
 
   const existing = await prisma.user.findUnique({ where: { id } });
   if (!existing) {
@@ -126,6 +126,30 @@ router.patch("/:id", async (req, res) => {
   }
 
   res.json({ user });
+});
+
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const existing = await prisma.user.findUnique({
+    where: { id, deletedAt: null },
+  });
+  if (!existing) {
+    throw new HttpNotFoundError("User not found");
+  }
+
+  if (existing.role === Role.admin) {
+    throw new HttpForbiddenError("Admin users cannot be deleted");
+  }
+
+  await prisma.user.update({
+    where: { id },
+    data: { deletedAt: new Date() },
+  });
+
+  await prisma.session.deleteMany({ where: { userId: id } });
+
+  res.status(204).send();
 });
 
 export default router;

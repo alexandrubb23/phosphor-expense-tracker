@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { getPrisma } from "./prisma.js";
 import { env } from "../env.js";
+import { Role } from "@expense-tracker/core";
 
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
@@ -24,8 +25,14 @@ export const auth = betterAuth({
     additionalFields: {
       role: {
         type: "string",
-        defaultValue: "user",
+        defaultValue: Role.user,
         input: false,
+        required: true,
+      },
+      deletedAt: {
+        type: "date",
+        input: false,
+        required: false,
       },
     },
   },

@@ -1,10 +1,11 @@
+import { Role } from "@expense-tracker/core";
 import { Http } from "./http";
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "user";
+  role: Role;
   emailVerified: boolean;
   createdAt: string;
 }
@@ -40,6 +41,10 @@ class UsersApi extends Http {
       payload
     );
     return data.user;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    this.http.delete(`${this.path}/${id}`);
   }
 }
 
