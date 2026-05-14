@@ -18,6 +18,7 @@ AlexB/                        ← monorepo root (Bun workspaces)
 │   │   │   └── LoginPage.tsx
 │   │   ├── components/       ← organised by domain
 │   │   │   ├── auth/         ← session, access control
+│   │   │   │   ├── LoginForm.tsx
 │   │   │   │   ├── ProtectedRoute.tsx
 │   │   │   │   └── SignOutButton.tsx
 │   │   │   ├── transactions/ ← transaction-domain UI
@@ -26,13 +27,19 @@ AlexB/                        ← monorepo root (Bun workspaces)
 │   │   │   │   ├── TransactionForm.tsx
 │   │   │   │   └── TransactionList.tsx
 │   │   │   └── ui/           ← generic, domain-agnostic UI
+│   │   │       ├── button.tsx        ← shadcn Button (Base UI)
+│   │   │       ├── card.tsx          ← shadcn Card
+│   │   │       ├── form.tsx          ← shadcn form primitives + FormInputField
+│   │   │       ├── input.tsx         ← shadcn Input (Base UI)
+│   │   │       ├── label.tsx         ← shadcn Label
 │   │   │       ├── Clock.tsx
+│   │   │       ├── FormRootError.tsx ← reusable root error alert for forms
 │   │   │       ├── Masthead.tsx
 │   │   │       ├── SectionHead.tsx
 │   │   │       └── HealthStatus.tsx  ← polls GET /api/health every 30 s
 │   │   └── lib/
 │   │       └── auth-client.ts ← Better Auth React client (signIn, signOut, useSession)
-│   └── vite.config.ts        ← proxies /api → localhost:3000
+│   └── vite.config.ts        ← proxies /api → localhost:3000, `@` alias → ./src
 ├── backend/                  ← Express 5 + TypeScript, run with Bun (port 3000)
 │   └── src/
 │       ├── index.ts          ← app entry, CORS, JSON middleware
@@ -50,6 +57,9 @@ AlexB/                        ← monorepo root (Bun workspaces)
 |---|---|
 | Runtime / package manager | Bun |
 | Frontend | Vite 7 + React 19 + TypeScript 5 |
+| Styling | Tailwind CSS v4 (`@tailwindcss/vite` plugin) |
+| UI components | shadcn/ui (style: `base-nova`, backed by **Base UI** — not Radix) |
+| Forms | react-hook-form + zod (resolver: `@hookform/resolvers/zod`) |
 | Backend | Express 5 + TypeScript 5, executed with `bun --watch` |
 | ORM | Prisma (PostgreSQL) — not yet scaffolded |
 | Auth | Better Auth (Express adapter, database sessions — no JWTs) |
@@ -64,11 +74,13 @@ bun run dev                        # start both workspaces concurrently
 bun run --filter frontend dev      # Vite HMR on :5173
 bun run --filter backend dev       # Express with bun --watch on :3000
 bun run --filter frontend build    # production build
+cd frontend && npx tsc --noEmit    # type-check frontend
 ```
 
 ## Key conventions
 - All frontend source is TypeScript (`.ts` / `.tsx`). No `.js` / `.jsx` in `frontend/`.
 - Shared domain types live in `frontend/src/types.ts`. Import from there, do not redeclare.
+- Use `@/` alias for all internal frontend imports (`@/` maps to `frontend/src/`).
 - Express routes are Express `Router` instances exported from `backend/src/routes/`.  
   Mount them in `backend/src/index.ts` under `/api/<resource>`.
 - CORS is configured in `backend/src/index.ts`; `credentials: true` is required for session cookies.
@@ -79,12 +91,27 @@ bun run --filter frontend build    # production build
 
 ## Frontend component organisation
 Components live under `frontend/src/components/` and are organised by domain:
-- `auth/` — authentication and access control (e.g. `ProtectedRoute`, `SignOutButton`)
+- `auth/` — authentication and access control (e.g. `ProtectedRoute`, `SignOutButton`, `LoginForm`)
 - `transactions/` — transaction-domain UI (e.g. `Summary`, `TransactionForm`)
-- `ui/` — generic, domain-agnostic primitives (e.g. `Masthead`, `SectionHead`, `Clock`)
+- `ui/` — generic, domain-agnostic primitives (e.g. `Masthead`, `SectionHead`, `Clock`, shadcn components)
 
 When creating a new component, place it in the folder matching its domain. If it could belong to multiple domains, prefer `ui/`.  
 Route-level components go in `frontend/src/pages/` (one file per route).
+
+## UI & design system
+- Dark cyberpunk theme. Custom Tailwind CSS variables defined in `frontend/src/index.css` under `@theme`.
+- Key color tokens: `bg` (#03060a), `cyan` (#00e5ff), `red` (#ff3a5c), `ink` (text), `surface`, `panel`, `hairline-glow`.
+- Fonts: `IBM Plex Mono` (display/mono), `IBM Plex Sans` (body).
+- The body background (`#03060a`) is **not** overridden by shadcn's `bg-background` — do not re-add `@apply bg-background` to `body`.
+- shadcn components are in `frontend/src/components/ui/`. Add new ones with `npx shadcn@latest add <component>`.
+
+## Forms
+- Use **react-hook-form** + **zod** for all forms. Resolver: `@hookform/resolvers/zod`.
+- Always set `defaultValues` in `useForm` to avoid Zod "expected string, received undefined" errors.
+- Reusable shadcn form primitives live in `src/components/ui/form.tsx`:
+  - `FormInputField` — labeled input with error message (use for text/email/password fields)
+  - `FormRootError` — displays root-level server errors (use `<FormRootError message={errors.root?.message} />`)
+  - `Form`, `FormField`, `FormItem`, `FormLabel`, `FormControl`, `FormMessage` — lower-level building blocks for custom layouts
 
 ## Error handling
 Never call `res.status(...).json(...)` directly in route handlers or middleware.
@@ -117,6 +144,55 @@ Available error classes (`backend/src/lib/http-errors.ts`):
 
 Add new subclasses to `http-errors.ts` as needed. Unknown errors fall through to a generic 500 response.
 
+## Authentication
+
+### Strategy
+- **Better Auth** with email/password. **No JWTs** — sessions are database-persisted cookies.
+- Sign-up is **disabled** (`disableSignUp: true`). Users are seeded directly in the database (see `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` env vars). This is a single-user personal finance app.
+- Users have a `role` field (default `"user"`) added via `additionalFields`.
+
+### Backend
+- Better Auth server is configured in `backend/src/lib/auth.ts`.
+- The handler is mounted in `backend/src/index.ts` **before** `express.json()` (Better Auth parses its own body):
+  ```ts
+  app.all("/api/auth/{*splat}", authHandler);
+  ```
+- Required env vars:
+  | Variable | Description |
+  |---|---|
+  | `BETTER_AUTH_SECRET` | Random secret ≥ 32 chars |
+  | `BETTER_AUTH_URL` | Backend origin e.g. `http://localhost:3000` |
+  | `FRONTEND_URL` | Added to `trustedOrigins` for CORS |
+  | `DATABASE_URL` | PostgreSQL connection URL |
+  | `SEED_ADMIN_EMAIL` | Email for the seeded admin user |
+  | `SEED_ADMIN_PASSWORD` | Password for the seeded admin user (≥ 8 chars) |
+
+### Frontend
+- Auth client is in `src/lib/auth-client.ts` — exports `signIn`, `signOut`, `useSession` from `better-auth/react`.
+- **`useSession()`** returns `{ data: session, isPending }`. Use this to check auth state in components.
+- **Login flow**: `signIn.email({ email, password })` → on success navigate to `/` with `state: { fromLogin: true }`.
+- **Sign-out flow**: `signOut({ fetchOptions: { onSuccess: () => navigate("/login") } })`.
+- **Route protection**: `ProtectedRoute` wraps all authenticated routes. It uses `useSession()` and redirects to `/login` if no session. It also handles a short `settling` delay after login to avoid a flash before the session propagates.
+
+### Routing
+```
+/login       → LoginPage (public)
+/*           → ProtectedRoute → HomePage (requires session)
+```
+
+### Adding auth to a new API route (backend)
+Use Better Auth's `auth.api.getSession` to verify the session in protected route handlers:
+```ts
+import { auth } from "../lib/auth.js";
+import { fromNodeHeaders } from "better-auth/node";
+import { HttpUnauthorizedError } from "../lib/http-errors.js";
+
+const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
+if (!session) throw new HttpUnauthorizedError();
+
+const userId = session.user.id;
+```
+
 ## Domain model (planned, Prisma not yet added)
 - **User** — owns everything; no cross-user data access.
 - **Account** — a wallet/bank account belonging to a user.
@@ -142,6 +218,10 @@ When writing or modifying code that touches any library in this project, **alway
 | Express 5 | `/websites/expressjs_en_5` |
 | Vite | `/vitejs/vite` |
 | React | `/facebook/react` |
+| Tailwind CSS v4 | `/tailwindlabs/tailwindcss` |
+| shadcn/ui | `/shadcn-ui/ui` |
+| react-hook-form | `/react-hook-form/react-hook-form` |
+| Zod | `/colinhacks/zod` |
 | Prisma | `/prisma/prisma` |
 | Better Auth | `/better-auth/better-auth` |
 | Vercel AI SDK | `/vercel/ai` |

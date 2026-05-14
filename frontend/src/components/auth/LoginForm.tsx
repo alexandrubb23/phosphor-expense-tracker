@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { signIn } from "../../lib/auth-client";
-import FormField from "../ui/FormField";
-import ErrorMessage, { ERROR_VARIANTS } from "../ui/ErrorMessage";
+import { Form, FormInputField } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import FormRootError from "@/components/ui/FormRootError";
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email address"),
@@ -13,26 +14,24 @@ const loginSchema = z.object({
 
 type LoginFields = z.infer<typeof loginSchema>;
 
-const Field = FormField<LoginFields>;
-
 export default function LoginForm() {
   const navigate = useNavigate();
 
-  const methods = useForm<LoginFields>({
+  const form = useForm<LoginFields>({
     resolver: zodResolver(loginSchema),
     mode: "onTouched",
+    defaultValues: { email: "", password: "" },
   });
 
   const {
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
-  } = methods;
+  } = form;
 
   const onSubmit = async ({ email, password }: LoginFields) => {
     try {
       const result = await signIn.email({ email, password });
-
       if (result.error) {
         setError("root", {
           message:
@@ -41,7 +40,6 @@ export default function LoginForm() {
         });
         return;
       }
-
       navigate("/", { replace: true, state: { fromLogin: true } });
     } catch {
       setError("root", {
@@ -51,13 +49,14 @@ export default function LoginForm() {
   };
 
   return (
-    <FormProvider {...methods}>
+    <Form {...form}>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-5"
         noValidate
       >
-        <Field
+        <FormInputField
+          control={form.control}
           name="email"
           label="EMAIL ADDRESS"
           type="email"
@@ -66,7 +65,8 @@ export default function LoginForm() {
           autoFocus
         />
 
-        <Field
+        <FormInputField
+          control={form.control}
           name="password"
           label="ACCESS CODE"
           type="password"
@@ -74,21 +74,18 @@ export default function LoginForm() {
           autoComplete="current-password"
         />
 
-        <ErrorMessage
-          message={errors.root?.message}
-          variant={ERROR_VARIANTS[1]}
-        />
+        <FormRootError message={errors.root?.message} />
 
-        <button
+        <Button
           type="submit"
-          className="mt-2 bg-cyan py-4 font-mono text-[11px] font-semibold uppercase tracking-[0.32em] text-bg-deep transition-all duration-200
+          disabled={isSubmitting}
+          className="mt-2 w-full rounded-none bg-cyan py-4 h-auto font-mono text-[11px] font-semibold uppercase tracking-[0.32em] text-bg-deep transition-all duration-200
             hover:bg-cyan-bright hover:tracking-[0.38em] hover:shadow-[0_0_36px_rgba(0,229,255,0.5),inset_0_0_16px_rgba(255,255,255,0.3)]
             disabled:cursor-not-allowed disabled:opacity-50 disabled:tracking-[0.2em]"
-          disabled={isSubmitting}
         >
           {isSubmitting ? "AUTHENTICATING…" : "AUTHENTICATE"}
-        </button>
+        </Button>
       </form>
-    </FormProvider>
+    </Form>
   );
 }
