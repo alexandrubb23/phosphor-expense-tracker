@@ -26,14 +26,20 @@ export default function FormField<T extends FieldValues = FieldValues>({
   const error = errors[name];
 
   return (
-    <div className="login-field">
-      <label className="login-label" htmlFor={name}>
+    <div className="flex flex-col gap-2">
+      <label
+        className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan"
+        htmlFor={name}
+      >
         {label}
       </label>
       <input
         id={name}
         type={type}
-        className="login-input"
+        className="w-full border border-hairline-glow bg-surface px-4 py-3.5 font-mono text-sm tracking-[0.04em] text-ink transition-all duration-200
+          placeholder:text-[11px] placeholder:tracking-[0.14em] placeholder:text-muted-soft
+          focus:border-cyan focus:bg-panel-raised focus:outline-none focus:shadow-[0_0_0_1px_#0098b5,0_0_24px_rgba(0,229,255,0.08)]
+          aria-invalid:border-red aria-invalid:bg-[rgba(255,58,92,0.04)] aria-invalid:shadow-[0_0_0_1px_#ff3a5c]"
         placeholder={placeholder}
         autoComplete={autoComplete}
         autoFocus={autoFocus}

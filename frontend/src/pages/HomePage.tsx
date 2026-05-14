@@ -95,7 +95,7 @@ export default function HomePage() {
   const operatorName = session?.user?.name?.toUpperCase() ?? "OPERATOR";
 
   return (
-    <div className="app">
+    <div className="relative mx-auto max-w-[1180px] px-10 pt-8 pb-30 max-sm:px-4.5 max-sm:pt-5.5 max-sm:pb-20">
       <Masthead
         sectorLabel="OPERATOR"
         sectorAccent={operatorName}
@@ -104,20 +104,21 @@ export default function HomePage() {
 
       <Summary transactions={transactions} />
 
-      <section className="section">
+      <section className="mb-17 opacity-0 animate-fade-up [animation-delay:0.5s]">
         <SectionHead
           eyebrow="02 / 04"
           title="Expenditure Distribution"
           status={
             <>
-              <span className="dot" /> LIVE
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-green shadow-[0_0_8px_rgba(77,255,170,0.4)]" />{" "}
+              LIVE
             </>
           }
         />
         <SpendingByCategory transactions={transactions} />
       </section>
 
-      <section className="section">
+      <section className="mb-17 opacity-0 animate-fade-up [animation-delay:0.65s]">
         <SectionHead
           eyebrow="03 / 04"
           title="Manual Log Entry"
@@ -126,13 +127,13 @@ export default function HomePage() {
         <TransactionForm categories={[...CATEGORIES]} onAdd={addTransaction} />
       </section>
 
-      <section className="section">
+      <section className="mb-17 opacity-0 animate-fade-up [animation-delay:0.8s]">
         <SectionHead
           eyebrow="04 / 04"
           title="Transaction Archive"
           status={
             <>
-              <span className="dot" />
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-green shadow-[0_0_8px_rgba(77,255,170,0.4)]" />
               {transactions.length} REC
             </>
           }

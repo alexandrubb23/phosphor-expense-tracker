@@ -14,14 +14,20 @@ export default function ErrorMessage({
 
   if (variant === ERROR_VARIANTS[1]) {
     return (
-      <div className="login-error" role="alert">
+      <div
+        className="border border-red bg-[rgba(255,58,92,0.06)] px-3.5 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-red [text-shadow:0_0_10px_rgba(255,58,92,0.5)]"
+        role="alert"
+      >
         ⚠ {message.toUpperCase()}
       </div>
     );
   }
 
   return (
-    <span className="login-field-error" role="alert">
+    <span
+      className="mt-1 block font-mono text-[10px] tracking-[0.14em] text-red [text-shadow:0_0_8px_rgba(255,58,92,0.5)]"
+      role="alert"
+    >
       {message.toUpperCase()}
     </span>
   );

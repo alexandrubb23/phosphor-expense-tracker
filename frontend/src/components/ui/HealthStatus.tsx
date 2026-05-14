@@ -37,10 +37,17 @@ function HealthStatus() {
         ? `API ONLINE · ${timestamp ? new Date(timestamp).toISOString().slice(11, 19) + " UTC" : ""}`
         : "API UNREACHABLE";
 
+  const dotClass =
+    state === "checking"
+      ? "bg-amber animate-pulse-dot"
+      : state === "online"
+        ? "bg-green shadow-[0_0_6px_rgba(77,255,170,0.4)]"
+        : "bg-red shadow-[0_0_6px_rgba(255,58,92,0.5)]";
+
   return (
-    <footer className="health-status">
-      <span className={`health-dot health-dot--${state}`} />
-      <span className="health-label">{label}</span>
+    <footer className="mt-16 flex items-center gap-2 rounded-xs border border-hairline bg-surface px-4 py-2.5 font-mono text-[11px] tracking-[0.08em] text-muted">
+      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dotClass}`} />
+      <span className="text-ink-soft">{label}</span>
     </footer>
   );
 }

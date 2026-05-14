@@ -11,8 +11,8 @@ function Clock() {
   const utc = now.toISOString().slice(11, 19);
 
   return (
-    <span className="masthead-clock">
-      <span className="label">T:</span>
+    <span className="font-medium text-ink [font-variant-numeric:tabular-nums]">
+      <span className="mr-2 font-normal text-muted">T:</span>
       {utc} UTC
     </span>
   );

@@ -5,9 +5,6 @@ import { useSession } from "../../lib/auth-client";
 export default function ProtectedRoute() {
   const { data: session, isPending } = useSession();
   const location = useLocation();
-  // After a client-side login redirect, Better Auth's session atom may not have
-  // updated yet. Give it a brief window (100ms) before treating missing session
-  // as "not authenticated" to avoid an instant redirect back to /login.
   const [settling, setSettling] = useState(location.state?.fromLogin === true);
 
   useEffect(() => {
@@ -18,9 +15,9 @@ export default function ProtectedRoute() {
 
   if (isPending || settling) {
     return (
-      <div className="auth-loading">
-        <span className="auth-loading-label">AUTHENTICATING</span>
-        <span className="auth-loading-dots" />
+      <div className="flex min-h-screen items-center justify-center gap-3.5 font-mono text-[11px] uppercase tracking-[0.28em] text-cyan">
+        <span>AUTHENTICATING</span>
+        <span className="animate-blink">...</span>
       </div>
     );
   }

@@ -15,17 +15,24 @@ export default function Masthead({
   const starDate = `FY26.${String(today.getMonth() + 1).padStart(2, "0")}.${String(today.getDate()).padStart(2, "0")}`;
 
   return (
-    <header className="masthead">
-      <div className="masthead-cluster">
-        <span className="masthead-tag">BR-04</span>
-        <span className="masthead-link">
-          <span className="dot" /> SECURE CHANNEL
+    <header className="relative mb-14 flex items-center justify-between rounded-xs border border-hairline bg-surface px-4.5 py-3.5 opacity-0 animate-fade-in [animation-delay:0.05s] max-sm:flex-col max-sm:items-start max-sm:gap-2.5">
+      <span className="absolute -top-px -left-px h-2 w-2 bg-cyan shadow-[0_0_12px_rgba(0,229,255,0.5)]" />
+      <span className="absolute -right-px -bottom-px h-2 w-2 bg-cyan shadow-[0_0_12px_rgba(0,229,255,0.5)]" />
+
+      <div className="flex items-center gap-5.5 font-mono text-[11px] uppercase tracking-[0.14em]">
+        <span className="relative flex items-center border border-cyan-dim px-2.25 py-1 font-medium text-cyan">
+          <span className="absolute top-1/2 -left-2 h-1.25 w-1.25 -translate-y-1/2 rounded-full bg-cyan shadow-[0_0_8px_rgba(0,229,255,0.5)] animate-blink" />
+          BR-04
+        </span>
+        <span className="flex items-center gap-2 text-ink-soft">
+          <span className="h-1.5 w-1.5 rounded-full bg-green shadow-[0_0_8px_rgba(77,255,170,0.4)]" />
+          SECURE CHANNEL
         </span>
         <Clock />
       </div>
-      <div className={actions ? "masthead-right" : undefined}>
-        <div className="masthead-sector">
-          {sectorLabel} <span className="accent">// {sectorAccent}</span> ·{" "}
+      <div className={actions ? "flex items-center gap-5" : undefined}>
+        <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
+          {sectorLabel} <span className="text-cyan">// {sectorAccent}</span> ·{" "}
           {starDate}
         </div>
         {actions}

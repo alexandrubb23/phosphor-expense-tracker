@@ -52,7 +52,11 @@ export default function LoginForm() {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="login-form" noValidate>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-5"
+        noValidate
+      >
         <Field
           name="email"
           label="EMAIL ADDRESS"
@@ -75,7 +79,13 @@ export default function LoginForm() {
           variant={ERROR_VARIANTS[1]}
         />
 
-        <button type="submit" className="login-submit" disabled={isSubmitting}>
+        <button
+          type="submit"
+          className="mt-2 bg-cyan py-4 font-mono text-[11px] font-semibold uppercase tracking-[0.32em] text-bg-deep transition-all duration-200
+            hover:bg-cyan-bright hover:tracking-[0.38em] hover:shadow-[0_0_36px_rgba(0,229,255,0.5),inset_0_0_16px_rgba(255,255,255,0.3)]
+            disabled:cursor-not-allowed disabled:opacity-50 disabled:tracking-[0.2em]"
+          disabled={isSubmitting}
+        >
           {isSubmitting ? "AUTHENTICATING…" : "AUTHENTICATE"}
         </button>
       </form>

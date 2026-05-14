@@ -10,10 +10,17 @@ export default function SectionHead({
   status,
 }: SectionHeadProps) {
   return (
-    <div className="section-head">
-      <span className="section-eyebrow">{eyebrow}</span>
-      <h2 className="section-title">{title}</h2>
-      <span className="section-status">{status}</span>
+    <div className="relative mb-7 flex items-center gap-5 border-b border-hairline-glow pb-3.5">
+      <span className="absolute -bottom-px left-0 h-px w-20 bg-cyan shadow-[0_0_8px_rgba(0,229,255,0.5)]" />
+      <span className="font-mono text-[11px] font-medium tracking-[0.18em] text-cyan">
+        {eyebrow}
+      </span>
+      <h2 className="flex-1 font-mono text-[15px] font-medium leading-none uppercase tracking-[0.18em] text-ink">
+        {title}
+      </h2>
+      <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.24em] text-muted">
+        {status}
+      </span>
     </div>
   );
 }

@@ -35,9 +35,14 @@ function CustomTooltip({
   if (!active || !payload?.length) return null;
   const entry = payload[0];
   return (
-    <div className="chart-tooltip">
-      <div className="chart-tooltip-label">▸ {entry.payload.name}</div>
-      <div className="chart-tooltip-value">${entry.value.toLocaleString()}</div>
+    <div className="relative border border-cyan-dim bg-bg px-4 py-3 font-mono text-xs text-ink shadow-[0_12px_32px_rgba(0,0,0,0.6),0_0_24px_rgba(0,229,255,0.08)]">
+      <span className="absolute -top-px -left-px h-1.5 w-1.5 bg-cyan" />
+      <div className="mb-1.5 text-[9px] uppercase tracking-[0.22em] text-muted">
+        ▸ {entry.payload.name}
+      </div>
+      <div className="text-[15px] font-medium text-cyan">
+        ${entry.value.toLocaleString()}
+      </div>
     </div>
   );
 }
@@ -55,9 +60,13 @@ function SpendingByCategory({ transactions }: SpendingByCategoryProps) {
     .sort((a, b) => b.value - a.value);
 
   return (
-    <div className="chart-card">
+    <div className="relative border border-hairline bg-panel px-6 pt-6 pb-2">
+      <span className="pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border border-cyan-dim border-r-0 border-b-0" />
+      <span className="pointer-events-none absolute -right-px -bottom-px h-2.5 w-2.5 border border-cyan-dim border-l-0 border-t-0" />
       {data.length === 0 ? (
-        <p className="chart-empty">NO SIGNAL · STANDBY</p>
+        <p className="py-10 text-center font-mono text-[13px] uppercase tracking-widest text-muted">
+          [_] NO SIGNAL · STANDBY [_]
+        </p>
       ) : (
         <ResponsiveContainer width="100%" height={320}>
           <BarChart
