@@ -161,16 +161,9 @@ Available error classes (`backend/src/lib/http-errors.ts`):
 Add new subclasses to `http-errors.ts` as needed. Unknown errors fall through to a generic 500 response.
 
 ## E2E testing (Playwright)
-- Tests live in `e2e/`. Run with `bun run test:e2e` from the monorepo root.
-- Browser: **Chromium only** (headless by default).
-- `playwright.config.ts` manages two `webServer` entries:
-  - **Backend** — started with `NODE_ENV=test`; loads `backend/.env.test` automatically.
-  - **Frontend** — standard `bun run dev` on `:5173`; Vite proxies `/api` to `:3000` as usual.
-- **Test database**: `expense-tracker-test` (PostgreSQL, same host/credentials as dev).  
-  `backend/.env.test` points `DATABASE_URL` at this database. File is gitignored; use `backend/.env.test.example` as a template.
-- **`e2e/global-setup.ts`**: runs `bunx prisma migrate deploy` against the test database before the test suite starts.
-- **`e2e/global-teardown.ts`**: stub — add cleanup logic (e.g. truncate tables) as needed.
-- Rate limiting is **disabled** in test (and dev) mode — only enabled in `production`.
+See `.github/agents/e2e-test-writer.agent.md` for the full test infrastructure details and writing guidelines.
+
+When the user asks to write or generate E2E tests, **always invoke the `e2e-test-writer` agent** instead of writing tests directly.
 
 ## Authentication
 
