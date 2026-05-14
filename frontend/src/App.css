@@ -1123,6 +1123,16 @@ td.col-action {
   text-shadow: 0 0 10px var(--red-glow);
 }
 
+.login-field-error {
+  display: block;
+  margin-top: 4px;
+  color: var(--red);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-shadow: 0 0 8px var(--red-glow);
+}
+
 .login-submit {
   margin-top: 8px;
   padding: 16px;
