@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { vi } from "vitest";
 import type { User } from "@/api/users";
@@ -6,6 +7,9 @@ import UsersPage from "../UsersPage";
 import { renderWithQuery } from "@/test/utils";
 
 vi.mock("@/hooks/useUsers");
+vi.mock("@/hooks/useCreateUser", () => ({
+  useCreateUser: () => ({ mutateAsync: vi.fn() }),
+}));
 vi.mock("@/lib/auth-client", () => ({
   useSession: () => ({ data: { user: { name: "Admin" } }, isPending: false }),
   signOut: vi.fn(),
@@ -108,5 +112,43 @@ describe("UsersPage", () => {
     renderPage();
 
     expect(screen.getByRole("banner")).toHaveTextContent("ADMIN");
+  });
+
+  describe("Create user modal", () => {
+    beforeEach(() => {
+      mockUseUsers.mockReturnValue(mockedUsers([]));
+    });
+
+    it("shows the modal when the New User button is clicked", async () => {
+      renderPage();
+
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole("button", { name: /new user/i }));
+
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("hides the modal when clicking the backdrop", async () => {
+      renderPage();
+
+      await userEvent.click(screen.getByRole("button", { name: /new user/i }));
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole("presentation"));
+
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+
+    it("hides the modal when pressing the Escape key", async () => {
+      renderPage();
+
+      await userEvent.click(screen.getByRole("button", { name: /new user/i }));
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+      fireEvent.keyDown(window, { key: "Escape" });
+
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
   });
 });
