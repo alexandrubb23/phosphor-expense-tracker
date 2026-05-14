@@ -91,6 +91,8 @@ bun run test:e2e                   # run Playwright E2E tests (headless Chromium
 bun run test:e2e:ui                # Playwright interactive UI mode
 bun run test:e2e:headed            # run tests with visible browser
 bun run test:e2e:report            # open last HTML test report
+cd frontend && npm test            # run component/unit tests (Vitest)
+cd frontend && npm run test:watch  # component tests in watch mode
 ```
 
 ## Key conventions
@@ -204,6 +206,119 @@ See `.github/agents/e2e-test-writer.agent.md` for the full test infrastructure d
 
 When the user asks to write or generate E2E tests, **always invoke the `e2e-test-writer` agent** instead of writing tests directly.
 
+## Component testing (Vitest + React Testing Library)
+
+### Running tests
+```bash
+cd frontend && npm test            # run all tests once
+cd frontend && npm run test:watch  # watch mode
+```
+
+### Framework & environment
+- **Vitest** with `happy-dom` (not `jsdom` — jsdom causes ESM conflicts with `@csstools/css-calc`).
+- **React Testing Library** + `@testing-library/jest-dom` for DOM assertions.
+- Config lives in the `test` block of `frontend/vite.config.ts` (imported from `vitest/config`, not `vite`).
+- Global setup: `frontend/src/test/setup.ts` (imports `@testing-library/jest-dom`).
+
+### File structure
+Co-locate tests next to the code they cover:
+```
+src/
+  components/users/
+    UserList.tsx
+    __tests__/
+      UserList.test.tsx
+  hooks/
+    useUsers.ts
+    __tests__/
+      useUsers.test.tsx
+  api/
+    users.ts
+    __tests__/
+      users.test.ts
+  pages/
+    UsersPage.tsx
+    __tests__/
+      UsersPage.test.tsx
+```
+
+### Shared test utilities
+`src/test/utils.tsx` exports helpers shared across test files:
+
+```tsx
+// Wraps children in a fresh QueryClientProvider (retry: false)
+export function renderWithQuery({ children }: { children: React.ReactNode }) { ... }
+```
+
+Pass it as `wrapper` option to `render` or `renderHook`:
+```tsx
+render(<MyComponent />, { wrapper: renderWithQuery });
+renderHook(() => useMyHook(), { wrapper: renderWithQuery });
+```
+
+### Testing layers
+
+**1. API service tests (`src/api/__tests__/<domain>.test.ts`)**  
+Mock axios with `vi.hoisted` so the factory runs before the module is imported:
+```ts
+const mockGet = vi.hoisted(() => vi.fn());
+
+vi.mock("axios", () => ({
+  default: { create: vi.fn(() => ({ get: mockGet })) },
+}));
+
+const { usersApi } = await import("@/api/users");
+// Capture axios.create args before clearAllMocks wipes them:
+const createCallArgs = vi.mocked(axios).create.mock.calls[0]?.[0];
+```
+Test: correct URL, `withCredentials: true`, response parsing, error propagation.
+
+**2. Hook tests (`src/hooks/__tests__/use<Domain>.test.tsx`)**  
+Mock the domain service (not axios directly) — the singleton is already constructed at import time:
+```ts
+vi.mock("@/api/users", () => ({ usersApi: { fetchUsers: vi.fn() } }));
+const { usersApi } = await import("@/api/users");
+const mockFetchUsers = vi.mocked(usersApi.fetchUsers);
+```
+Extract a render helper to avoid repeating `renderHook` + wrapper boilerplate:
+```ts
+const renderUseUsers = () =>
+  renderHook(() => useUsers(), { wrapper: renderWithQuery });
+```
+Test: pending state, success (data returned), error surfaced.
+
+**3. Component tests (`src/components/<domain>/__tests__/<Component>.test.tsx`)**  
+Render with props directly. No mocking needed for pure presentational components.  
+Test: empty state, per-item data, role/status badges, column headers.
+
+**4. Page tests (`src/pages/__tests__/<Page>.test.tsx`)**  
+Mock the hook (not the service or axios) to control render state:
+```ts
+vi.mock("@/hooks/useUsers");
+const { useUsers } = await import("@/hooks/useUsers");
+const mockUseUsers = vi.mocked(useUsers);
+```
+Extract a `mockedUsers` helper for the repeated mock object:
+```ts
+function mockedUsers(data: User[] | undefined, overrides: Record<string, unknown> = {}) {
+  return { data, isPending: false, isError: false, error: null, ...overrides }
+    as unknown as ReturnType<typeof useUsers>;
+}
+// Usage:
+mockUseUsers.mockReturnValue(mockedUsers(MOCK_USERS));
+mockUseUsers.mockReturnValue(mockedUsers(undefined, { isPending: true }));
+mockUseUsers.mockReturnValue(mockedUsers(undefined, { isError: true, error: new Error("...") }));
+```
+Use `as unknown as ReturnType<typeof useHook>` (double cast) when the partial mock object doesn't overlap enough with the full return type.
+
+### Conventions
+- Always call `afterEach(() => vi.clearAllMocks())` when mocking.
+- Use `it.each` for parameterized cases (multiple roles, error messages, data variants).
+- Extract internal helper functions (e.g. `renderUseUsers`, `mockedUsers`, `renderPage`) to eliminate repetition within a test file.
+- Prefer `screen.getByRole` / `screen.getByText` over container queries.
+- Use `waitFor` + `isSuccess` / `isError` flags (not `isLoading`) to await TanStack Query state in hook tests.
+- `QueryClientProvider` is already in `renderWithQuery` — never add another one in a test.
+
 ## Authentication
 
 ### Strategy
@@ -297,6 +412,8 @@ When writing or modifying code that touches any library in this project, **alway
 | Vercel AI SDK | `/vercel/ai` |
 | Recharts | `/recharts/recharts` |
 | Playwright | `/microsoft/playwright` |
+| Vitest | `/vitest-dev/vitest` |
+| React Testing Library | `/testing-library/react-testing-library` |
 | TypeScript | `/microsoft/typescript` |
 
 ### How to use Context7
