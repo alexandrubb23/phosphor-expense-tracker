@@ -114,6 +114,45 @@ Components live under `frontend/src/components/` and are organised by domain:
 When creating a new component, place it in the folder matching its domain. If it could belong to multiple domains, prefer `ui/`.  
 Route-level components go in `frontend/src/pages/` (one file per route).
 
+## Data fetching
+All API communication goes through the layered service pattern in `frontend/src/api/`:
+
+1. **`src/api/http.ts`** — abstract base class. Creates a shared `axios` instance (configured with `baseURL: VITE_API_URL` and `withCredentials: true`). Never instantiate this directly.
+
+2. **`src/api/<domain>.ts`** — one file per backend domain. Create a class that extends `Http` and exposes typed async methods. Export a singleton.
+
+```ts
+// src/api/users.ts — example
+import { Http } from "./http";
+
+class UsersApi extends Http {
+  async fetchUsers(): Promise<User[]> {
+    const { data } = await this.http.get<{ users: User[] }>("/api/admin/users");
+    return data.users;
+  }
+}
+
+export const usersApi = new UsersApi();
+```
+
+3. **`src/hooks/use<Domain>.ts`** — TanStack Query hook that calls the service. Keep it thin — just `useQuery` / `useMutation` wiring.
+
+```ts
+// src/hooks/useUsers.ts — example
+import { useQuery } from "@tanstack/react-query";
+import { usersApi } from "@/api/users";
+
+export function useUsers() {
+  return useQuery({ queryKey: ["admin", "users"], queryFn: () => usersApi.fetchUsers() });
+}
+```
+
+**Rules:**
+- Never call `axios` directly from a component or hook — always go through a domain service.
+- Never call `fetch` — use the `Http` base class.
+- Domain types (interfaces / enums) belong in `src/api/<domain>.ts`, not in `src/types.ts` (which is for non-API shared types).
+- `QueryClientProvider` is already mounted in `main.tsx` — do not add another one.
+
 ## UI & design system
 - Dark cyberpunk theme. Custom Tailwind CSS variables defined in `frontend/src/index.css` under `@theme`.
 - Key color tokens: `bg` (#03060a), `cyan` (#00e5ff), `red` (#ff3a5c), `ink` (text), `surface`, `panel`, `hairline-glow`.

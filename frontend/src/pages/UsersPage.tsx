@@ -6,7 +6,7 @@ import UserList from "../components/users/UserList";
 import { useUsers } from "../hooks/useUsers";
 
 export default function UsersPage() {
-  const { users, isLoading, error } = useUsers();
+  const { data: users = [], isPending, isError, error } = useUsers();
 
   return (
     <div className="relative mx-auto max-w-295 px-10 pt-8 pb-30 max-sm:px-4.5 max-sm:pt-5.5 max-sm:pb-20">
@@ -26,24 +26,24 @@ export default function UsersPage() {
           eyebrow="01 / 01"
           title="Users"
           status={
-            isLoading ? "LOADING..." : error ? "ERROR" : `${users.length} REC`
+            isPending ? "LOADING..." : isError ? "ERROR" : `${users.length} REC`
           }
         />
 
-        {isLoading && (
+        {isPending && (
           <div className="flex items-center gap-3.5 font-mono text-[11px] uppercase tracking-[0.28em] text-muted">
             <span>FETCHING RECORDS</span>
             <span className="animate-blink">...</span>
           </div>
         )}
 
-        {!isLoading && error && (
+        {isError && (
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-red">
-            ⚠ {error}
+            ⚠ {error instanceof Error ? error.message : "Unknown error"}
           </p>
         )}
 
-        {!isLoading && !error && <UserList users={users} />}
+        {!isPending && !isError && <UserList users={users} />}
       </section>
     </div>
   );
