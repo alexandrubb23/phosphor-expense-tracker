@@ -2,13 +2,16 @@ import { useState } from "react";
 import SectionHead from "@/components/ui/SectionHead";
 import UserList from "@/components/users/UserList";
 import UserListSkeleton from "@/components/users/UserListSkeleton";
-import CreateUserModal from "@/components/users/CreateUserModal";
+import UserFormModal from "@/components/users/UserFormModal";
 import NewUserButton from "@/components/users/NewUserButton";
 import { useUsers } from "@/hooks/useUsers";
+import type { User } from "@/api/users";
+
+type ModalState = null | "create" | User;
 
 export default function UsersSection() {
   const { data: users = [], isPending, isError, error } = useUsers();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalState, setModalState] = useState<ModalState>(null);
 
   return (
     <section className="opacity-0 animate-fade-up [animation-delay:0.3s]">
@@ -21,7 +24,7 @@ export default function UsersSection() {
       />
 
       <div className="mb-5 flex justify-end">
-        <NewUserButton onClick={() => setIsModalOpen(true)} />
+        <NewUserButton onClick={() => setModalState("create")} />
       </div>
 
       {isPending && <UserListSkeleton />}
@@ -32,9 +35,16 @@ export default function UsersSection() {
         </p>
       )}
 
-      {!isPending && !isError && <UserList users={users} />}
+      {!isPending && !isError && (
+        <UserList users={users} onEdit={setModalState} />
+      )}
 
-      {isModalOpen && <CreateUserModal onClose={() => setIsModalOpen(false)} />}
+      {modalState !== null && (
+        <UserFormModal
+          user={modalState === "create" ? undefined : modalState}
+          onClose={() => setModalState(null)}
+        />
+      )}
     </section>
   );
 }

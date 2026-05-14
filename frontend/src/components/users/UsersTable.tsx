@@ -1,3 +1,4 @@
+import { Pencil } from "lucide-react";
 import type { User } from "@/api/users";
 import {
   Table,
@@ -10,6 +11,7 @@ import {
 
 interface UsersTableProps {
   users: User[];
+  onEdit: (user: User) => void;
 }
 
 function shortId(id: string) {
@@ -24,7 +26,7 @@ function formatDate(iso: string) {
   });
 }
 
-export default function UsersTable({ users }: UsersTableProps) {
+export default function UsersTable({ users, onEdit }: UsersTableProps) {
   return (
     <Table className="border-collapse border border-hairline bg-panel">
       <TableHeader>
@@ -46,6 +48,9 @@ export default function UsersTable({ users }: UsersTableProps) {
           </TableHead>
           <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan">
             JOINED
+          </TableHead>
+          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan">
+            ACTIONS
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -89,6 +94,16 @@ export default function UsersTable({ users }: UsersTableProps) {
             </TableCell>
             <TableCell className="px-4.5 py-4 font-mono text-[11px] tracking-[0.06em] text-ink-soft">
               {formatDate(user.createdAt)}
+            </TableCell>
+            <TableCell className="px-4.5 py-4 text-right">
+              <button
+                type="button"
+                onClick={() => onEdit(user)}
+                aria-label={`Edit ${user.name}`}
+                className="text-muted transition-colors duration-200 hover:text-cyan"
+              >
+                <Pencil size={14} />
+              </button>
             </TableCell>
           </TableRow>
         ))}

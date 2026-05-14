@@ -3,23 +3,38 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AxiosError } from "axios";
 import { useEventListener } from "usehooks-ts";
-import { createUserSchema, type CreateUserFields } from "@expense-tracker/core";
+import {
+  createUserSchema,
+  editUserSchema,
+  type CreateUserFields,
+  type EditUserFields,
+} from "@expense-tracker/core";
 import { Form, FormInputField } from "@/components/ui/form";
 import FormRootError from "@/components/ui/FormRootError";
 import { useCreateUser } from "@/hooks/useCreateUser";
+import { useUpdateUser } from "@/hooks/useUpdateUser";
+import type { User } from "@/api/users";
 
-interface CreateUserModalProps {
+interface UserFormModalProps {
+  user?: User;
   onClose: () => void;
 }
 
-export default function CreateUserModal({ onClose }: CreateUserModalProps) {
-  const { mutateAsync } = useCreateUser();
+type FormFields = CreateUserFields | EditUserFields;
 
-  const form = useForm<CreateUserFields>({
-    resolver: zodResolver(createUserSchema),
+export default function UserFormModal({ user, onClose }: UserFormModalProps) {
+  const isEdit = user !== undefined;
+
+  const { mutateAsync: createUser } = useCreateUser();
+  const { mutateAsync: updateUser } = useUpdateUser(user?.id ?? "");
+
+  const form = useForm<FormFields>({
+    resolver: zodResolver(isEdit ? editUserSchema : createUserSchema),
     mode: "onSubmit",
     reValidateMode: "onChange",
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues: isEdit
+      ? { name: user.name, email: user.email, password: "" }
+      : { name: "", email: "", password: "" },
   });
 
   const {
@@ -32,16 +47,22 @@ export default function CreateUserModal({ onClose }: CreateUserModalProps) {
     if (e.key === "Escape") onClose();
   });
 
-  const onSubmit = async (data: CreateUserFields) => {
+  const onSubmit = async (data: FormFields) => {
     try {
-      await mutateAsync(data);
+      if (isEdit) {
+        const payload = { ...data } as EditUserFields;
+        if (!payload.password) delete payload.password;
+        await updateUser(payload);
+      } else {
+        await createUser(data as CreateUserFields);
+      }
       onClose();
     } catch (err) {
       const message =
         err instanceof AxiosError
           ? ((err.response?.data?.error as string | undefined) ??
-            "Failed to create user")
-          : "Failed to create user";
+            `Failed to ${isEdit ? "update" : "create"} user`)
+          : `Failed to ${isEdit ? "update" : "create"} user`;
       setError("root", { message });
     }
   };
@@ -57,7 +78,7 @@ export default function CreateUserModal({ onClose }: CreateUserModalProps) {
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="create-user-title"
+        aria-labelledby="user-form-title"
       >
         {/* Corner accents */}
         <span className="pointer-events-none absolute -top-px -left-px h-3 w-3 border-t border-l border-cyan" />
@@ -65,10 +86,10 @@ export default function CreateUserModal({ onClose }: CreateUserModalProps) {
 
         <div className="mb-6 flex items-center justify-between">
           <h2
-            id="create-user-title"
+            id="user-form-title"
             className="font-mono text-[13px] font-medium uppercase tracking-[0.22em] text-ink"
           >
-            New User
+            {isEdit ? "Edit User" : "New User"}
           </h2>
           <button
             type="button"
@@ -110,7 +131,9 @@ export default function CreateUserModal({ onClose }: CreateUserModalProps) {
               name="password"
               label="PASSWORD"
               type="password"
-              placeholder="••••••••••••"
+              placeholder={
+                isEdit ? "LEAVE BLANK TO KEEP CURRENT" : "••••••••••••"
+              }
               autoComplete="new-password"
             />
 
@@ -123,7 +146,13 @@ export default function CreateUserModal({ onClose }: CreateUserModalProps) {
                 hover:bg-cyan-bright hover:tracking-[0.38em] hover:shadow-[0_0_36px_rgba(0,229,255,0.5),inset_0_0_16px_rgba(255,255,255,0.3)]
                 disabled:cursor-not-allowed disabled:opacity-50 disabled:tracking-[0.2em]"
             >
-              {isSubmitting ? "CREATING…" : "▸ CREATE USER"}
+              {isSubmitting
+                ? isEdit
+                  ? "SAVING…"
+                  : "CREATING…"
+                : isEdit
+                  ? "▸ SAVE CHANGES"
+                  : "▸ CREATE USER"}
             </button>
           </form>
         </Form>

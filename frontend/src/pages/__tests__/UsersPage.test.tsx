@@ -10,6 +10,9 @@ vi.mock("@/hooks/useUsers");
 vi.mock("@/hooks/useCreateUser", () => ({
   useCreateUser: () => ({ mutateAsync: vi.fn() }),
 }));
+vi.mock("@/hooks/useUpdateUser", () => ({
+  useUpdateUser: () => ({ mutateAsync: vi.fn() }),
+}));
 vi.mock("@/lib/auth-client", () => ({
   useSession: () => ({ data: { user: { name: "Admin" } }, isPending: false }),
   signOut: vi.fn(),

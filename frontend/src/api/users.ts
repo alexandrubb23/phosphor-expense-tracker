@@ -15,6 +15,12 @@ export interface NewUser {
   password: string;
 }
 
+export interface EditUser {
+  name: string;
+  email: string;
+  password?: string;
+}
+
 class UsersApi extends Http {
   private readonly path = "/api/admin/users";
 
@@ -25,6 +31,14 @@ class UsersApi extends Http {
 
   async createUser(newUser: NewUser): Promise<User> {
     const { data } = await this.http.post<{ user: User }>(this.path, newUser);
+    return data.user;
+  }
+
+  async updateUser(id: string, payload: EditUser): Promise<User> {
+    const { data } = await this.http.patch<{ user: User }>(
+      `${this.path}/${id}`,
+      payload
+    );
     return data.user;
   }
 }

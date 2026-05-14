@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { randomUUID } from "crypto";
 import { hashPassword } from "better-auth/crypto";
-import { createUserSchema } from "@expense-tracker/core";
+import { createUserSchema, editUserSchema } from "@expense-tracker/core";
 import { getPrisma } from "../../lib/prisma.js";
 import { Role } from "../../generated/prisma/client.js";
 import { validate } from "../../lib/validate.js";
-import { HttpConflictError } from "../../lib/http-errors.js";
+import { HttpConflictError, HttpNotFoundError } from "../../lib/http-errors.js";
 
 const router = Router();
 
@@ -68,6 +68,64 @@ router.post("/", async (req, res) => {
   });
 
   res.status(201).json({ user });
+});
+
+router.patch("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, email, password } = validate(editUserSchema, req.body);
+
+  const prisma = getPrisma();
+
+  const existing = await prisma.user.findUnique({ where: { id } });
+  if (!existing) {
+    throw new HttpNotFoundError("User not found");
+  }
+
+  if (email !== existing.email) {
+    const conflict = await prisma.user.findUnique({ where: { email } });
+    if (conflict) {
+      throw new HttpConflictError("A user with this email already exists");
+    }
+  }
+
+  const user = await prisma.user.update({
+    where: { id },
+    data: { name, email },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      emailVerified: true,
+      createdAt: true,
+    },
+  });
+
+  if (password) {
+    const hashedPassword = await hashPassword(password);
+    const account = await prisma.account.findFirst({
+      where: { providerId: "credential", accountId: id },
+    });
+
+    if (account) {
+      await prisma.account.update({
+        where: { id: account.id },
+        data: { password: hashedPassword },
+      });
+    } else {
+      await prisma.account.create({
+        data: {
+          id: randomUUID(),
+          accountId: id,
+          providerId: "credential",
+          userId: id,
+          password: hashedPassword,
+        },
+      });
+    }
+  }
+
+  res.json({ user });
 });
 
 export default router;
