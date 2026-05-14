@@ -18,6 +18,14 @@ const prisma = getPrisma();
 
 async function main() {
   const email = env.SEED_ADMIN_EMAIL;
+  const password = env.SEED_ADMIN_PASSWORD;
+
+  if (!email || !password) {
+    console.error(
+      "❌ SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD must be set to run the seed script."
+    );
+    process.exit(1);
+  }
 
   const existing = await prisma.user.findUnique({ where: { email } });
 
@@ -47,7 +55,7 @@ async function main() {
       accountId: id,
       providerId: "credential",
       userId: id,
-      password: await hashPassword(env.SEED_ADMIN_PASSWORD),
+      password: await hashPassword(password),
       createdAt: now,
       updatedAt: now,
     },

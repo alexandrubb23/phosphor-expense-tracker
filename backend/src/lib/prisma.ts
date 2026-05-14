@@ -13,7 +13,7 @@ export function getPrisma(): any {
     const adapter = new PrismaPg({ connectionString: env.DATABASE_URL });
     _prisma = new PrismaClient({
       adapter,
-      log: env.NODE_ENV === "development" ? ["query", "error"] : ["error"],
+      log: ["error"],
     });
   }
   return _prisma;

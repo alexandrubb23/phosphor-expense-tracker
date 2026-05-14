@@ -1,4 +1,5 @@
 import express from "express";
+import helmet from "helmet";
 import cors from "cors";
 import { env } from "./env.js";
 import { authHandler } from "./routes/auth.js";
@@ -7,6 +8,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
+app.use(helmet());
 app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 
 // Better Auth handles its own body parsing — must be mounted before express.json()
