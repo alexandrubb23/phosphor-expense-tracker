@@ -15,9 +15,11 @@ AlexB/                        ← monorepo root (Bun workspaces)
 │   │   ├── App.tsx           ← router only (Routes + Route declarations)
 │   │   ├── pages/            ← one file per route
 │   │   │   ├── HomePage.tsx
-│   │   │   └── LoginPage.tsx
+│   │   │   ├── LoginPage.tsx
+│   │   │   └── UsersPage.tsx ← admin-only users page (/users)
 │   │   ├── components/       ← organised by domain
 │   │   │   ├── auth/         ← session, access control
+│   │   │   │   ├── AdminRoute.tsx    ← redirects non-admins to /
 │   │   │   │   ├── LoginForm.tsx
 │   │   │   │   ├── ProtectedRoute.tsx
 │   │   │   │   └── SignOutButton.tsx
@@ -35,10 +37,14 @@ AlexB/                        ← monorepo root (Bun workspaces)
 │   │   │       ├── Clock.tsx
 │   │   │       ├── FormRootError.tsx ← reusable root error alert for forms
 │   │   │       ├── Masthead.tsx
+│   │   │       ├── NavButton.tsx     ← reusable styled NavLink for masthead nav
 │   │   │       ├── SectionHead.tsx
 │   │   │       └── HealthStatus.tsx  ← polls GET /api/health every 30 s
+│   │   ├── hooks/
+│   │   │   ├── useCountUp.ts
+│   │   │   └── useIsAdmin.ts ← returns true if session.user.role === "admin"
 │   │   └── lib/
-│   │       └── auth-client.ts ← Better Auth React client (signIn, signOut, useSession)
+│   │       └── auth-client.ts ← Better Auth React client; uses inferAdditionalFields for role typing
 │   └── vite.config.ts        ← proxies /api → localhost:3000, `@` alias → ./src
 ├── backend/                  ← Express 5 + TypeScript, run with Bun (port 3000)
 │   └── src/
@@ -91,7 +97,7 @@ cd frontend && npx tsc --noEmit    # type-check frontend
 
 ## Frontend component organisation
 Components live under `frontend/src/components/` and are organised by domain:
-- `auth/` — authentication and access control (e.g. `ProtectedRoute`, `SignOutButton`, `LoginForm`)
+- `auth/` — authentication and access control (e.g. `ProtectedRoute`, `AdminRoute`, `SignOutButton`, `LoginForm`)
 - `transactions/` — transaction-domain UI (e.g. `Summary`, `TransactionForm`)
 - `ui/` — generic, domain-agnostic primitives (e.g. `Masthead`, `SectionHead`, `Clock`, shadcn components)
 
@@ -168,8 +174,8 @@ Add new subclasses to `http-errors.ts` as needed. Unknown errors fall through to
   | `SEED_ADMIN_PASSWORD` | Password for the seeded admin user (≥ 8 chars) |
 
 ### Frontend
-- Auth client is in `src/lib/auth-client.ts` — exports `signIn`, `signOut`, `useSession` from `better-auth/react`.
 - **`useSession()`** returns `{ data: session, isPending }`. Use this to check auth state in components.
+- **`useIsAdmin()`** hook (`src/hooks/useIsAdmin.ts`) — returns `true` if `session.user.role === "admin"`. Use this instead of reading the role directly.
 - **Login flow**: `signIn.email({ email, password })` → on success navigate to `/` with `state: { fromLogin: true }`.
 - **Sign-out flow**: `signOut({ fetchOptions: { onSuccess: () => navigate("/login") } })`.
 - **Route protection**: `ProtectedRoute` wraps all authenticated routes. It uses `useSession()` and redirects to `/login` if no session. It also handles a short `settling` delay after login to avoid a flash before the session propagates.
@@ -177,8 +183,17 @@ Add new subclasses to `http-errors.ts` as needed. Unknown errors fall through to
 ### Routing
 ```
 /login       → LoginPage (public)
+/users       → ProtectedRoute → AdminRoute → UsersPage (requires role: "admin")
 /*           → ProtectedRoute → HomePage (requires session)
 ```
+
+### Role-based access control
+- Users have a `role` field (`"admin"` | `"user"`, default `"user"`).
+- **`AdminRoute`** (`src/components/auth/AdminRoute.tsx`) — layout route that reads `useIsAdmin()` and redirects non-admins to `/`. Nest any admin-only route inside it in `App.tsx`.
+- **`useIsAdmin()`** (`src/hooks/useIsAdmin.ts`) — the single source of truth for admin checks on the frontend.
+- `session.user.role` is properly typed via `inferAdditionalFields` in `auth-client.ts` — no type casts needed.
+- To create users, run the seed script or use the inline pattern from `backend/prisma/seed.ts` (hashing via `hashPassword` from `better-auth/crypto`).
+
 
 ### Adding auth to a new API route (backend)
 Use Better Auth's `auth.api.getSession` to verify the session in protected route handlers:

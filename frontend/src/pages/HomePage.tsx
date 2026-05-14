@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useSession } from "../lib/auth-client";
+import { useIsAdmin } from "../hooks/useIsAdmin";
 import Masthead from "../components/ui/Masthead";
+import NavButton from "../components/ui/NavButton";
 import SectionHead from "../components/ui/SectionHead";
 import SignOutButton from "../components/auth/SignOutButton";
 import Summary from "../components/transactions/Summary";
@@ -93,13 +95,19 @@ export default function HomePage() {
   };
 
   const operatorName = session?.user?.name?.toUpperCase() ?? "OPERATOR";
+  const isAdmin = useIsAdmin();
 
   return (
-    <div className="relative mx-auto max-w-[1180px] px-10 pt-8 pb-30 max-sm:px-4.5 max-sm:pt-5.5 max-sm:pb-20">
+    <div className="relative mx-auto max-w-295 px-10 pt-8 pb-30 max-sm:px-4.5 max-sm:pt-5.5 max-sm:pb-20">
       <Masthead
         sectorLabel="OPERATOR"
         sectorAccent={operatorName}
-        actions={<SignOutButton />}
+        actions={
+          <div className="flex items-center gap-2.5">
+            {isAdmin && <NavButton to="/users">USERS</NavButton>}
+            <SignOutButton />
+          </div>
+        }
       />
 
       <Summary transactions={transactions} />
