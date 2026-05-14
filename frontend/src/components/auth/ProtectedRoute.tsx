@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useSession } from "../../lib/auth-client";
+import Spinner from "../ui/Spinner";
 
 export default function ProtectedRoute() {
   const { data: session, isPending } = useSession();
@@ -14,12 +15,7 @@ export default function ProtectedRoute() {
   }, [settling]);
 
   if (isPending || settling) {
-    return (
-      <div className="flex min-h-screen items-center justify-center gap-3.5 font-mono text-[11px] uppercase tracking-[0.28em] text-cyan">
-        <span>AUTHENTICATING</span>
-        <span className="animate-blink">...</span>
-      </div>
-    );
+    return <Spinner />;
   }
 
   if (!session) {

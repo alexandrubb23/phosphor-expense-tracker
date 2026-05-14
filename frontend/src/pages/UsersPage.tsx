@@ -3,6 +3,7 @@ import Masthead from "../components/ui/Masthead";
 import SignOutButton from "../components/auth/SignOutButton";
 import SectionHead from "../components/ui/SectionHead";
 import UserList from "../components/users/UserList";
+import UserListSkeleton from "../components/users/UserListSkeleton";
 import { useUsers } from "../hooks/useUsers";
 
 export default function UsersPage() {
@@ -30,12 +31,7 @@ export default function UsersPage() {
           }
         />
 
-        {isPending && (
-          <div className="flex items-center gap-3.5 font-mono text-[11px] uppercase tracking-[0.28em] text-muted">
-            <span>FETCHING RECORDS</span>
-            <span className="animate-blink">...</span>
-          </div>
-        )}
+        {isPending && <UserListSkeleton />}
 
         {isError && (
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-red">
