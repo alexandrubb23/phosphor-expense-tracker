@@ -22,6 +22,7 @@ export default async function globalSetup() {
     "SEED_ADMIN_PASSWORD",
     "TEST_USER_EMAIL",
     "TEST_USER_PASSWORD",
+    "WEBHOOK_SECRET",
   ] as const;
   for (const key of credentialKeys) {
     if (testEnv[key]) process.env[key] = testEnv[key];

@@ -221,6 +221,18 @@ See `.github/agents/e2e-test-writer.agent.md` for the full test infrastructure d
 
 When the user asks to write or generate E2E tests, **always invoke the `e2e-test-writer` agent** instead of writing tests directly.
 
+### Test database cleanup convention
+`backend/prisma/cleanup-test.ts` runs after every suite (via `global-teardown.ts`) and must be kept in sync with the data model.
+
+**Rule: whenever a new feature domain introduces a DB model that tests can write to, add a `deleteMany()` block for it in `cleanup-test.ts`.**
+
+Current domains cleaned up:
+| Domain | Model(s) cleaned |
+|---|---|
+| Auth / users | `User` (non-seed), `Session`, `Verification` |
+| Transactions | `Transaction` (all rows belonging to seed users) |
+| Whitelist | `SenderWhitelist` (all rows belonging to seed users) |
+
 ## Component testing (Vitest + React Testing Library)
 
 ### Running tests

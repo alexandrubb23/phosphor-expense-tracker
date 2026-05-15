@@ -7,6 +7,11 @@
  *     via CASCADE).
  *   - All sessions belonging to the seed users (stale auth state).
  *   - All verification records.
+ *   - All transactions belonging to seed users (created during tests).
+ *   - All sender-whitelist entries belonging to seed users (created during tests).
+ *
+ * Convention: every new feature domain that creates DB rows during e2e tests
+ * must add a corresponding deleteMany() block here.
  *
  * Usage (called automatically by global-teardown):
  *   bun prisma/cleanup-test.ts
@@ -44,9 +49,27 @@ async function main() {
     {}
   );
 
+  // Delete all transactions belonging to seed users (created during tests).
+  const seedUsers = await prisma.user.findMany({
+    where: { email: { in: seedEmails } },
+    select: { id: true },
+  });
+  const seedUserIds = seedUsers.map((u: { id: string }) => u.id);
+
+  const { count: deletedTransactions } = await prisma.transaction.deleteMany({
+    where: { userId: { in: seedUserIds } },
+  });
+
+  // Delete all whitelist entries belonging to seed users.
+  const { count: deletedWhitelist } = await prisma.senderWhitelist.deleteMany({
+    where: { userId: { in: seedUserIds } },
+  });
+
   console.log(`  🗑️  Deleted ${deletedUsers} test user(s)`);
   console.log(`  🗑️  Deleted ${deletedSessions} session(s)`);
   console.log(`  🗑️  Deleted ${deletedVerifications} verification record(s)`);
+  console.log(`  🗑️  Deleted ${deletedTransactions} transaction(s)`);
+  console.log(`  🗑️  Deleted ${deletedWhitelist} whitelist entries`);
 
   await prisma.$disconnect();
 }
