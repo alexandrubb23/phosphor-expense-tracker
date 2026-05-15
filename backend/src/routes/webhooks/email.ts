@@ -39,31 +39,44 @@ router.post("/", upload.none(), async (req, res) => {
     return;
   }
 
-  const extraction = await extractTransaction(effectiveSubject, effectiveBody);
-
-  const status =
-    extraction.confidence === Confidence.High
-      ? TransactionStatus.Confirmed
-      : TransactionStatus.Pending;
-
-  const date = extraction.date ? new Date(extraction.date) : new Date();
-
-  await prisma.transaction.create({
-    data: {
-      userId: whitelistEntry.userId,
-      description: extraction.description,
-      amount: extraction.amount,
-      operationType: extraction.operationType,
-      category: extraction.category,
-      subcategory: extraction.subcategory ?? null,
-      currency: Currency.RON,
-      status,
-      date,
-      rawEmailBody: effectiveBody,
-    },
-  });
-
+  // Respond immediately so SendGrid doesn't time out or retry.
+  // Extraction + DB write happen asynchronously in the background.
   res.status(200).json({ ok: true });
+
+  const { userId } = whitelistEntry;
+
+  (async () => {
+    try {
+      const extraction = await extractTransaction(
+        effectiveSubject,
+        effectiveBody
+      );
+
+      const status =
+        extraction.confidence === Confidence.High
+          ? TransactionStatus.Confirmed
+          : TransactionStatus.Pending;
+
+      const date = extraction.date ? new Date(extraction.date) : new Date();
+
+      await prisma.transaction.create({
+        data: {
+          userId,
+          description: extraction.description,
+          amount: extraction.amount,
+          operationType: extraction.operationType,
+          category: extraction.category,
+          subcategory: extraction.subcategory ?? null,
+          currency: Currency.RON,
+          status,
+          date,
+          rawEmailBody: effectiveBody,
+        },
+      });
+    } catch (err) {
+      console.error("[webhook/email] async processing failed", err);
+    }
+  })();
 });
 
 export default router;
