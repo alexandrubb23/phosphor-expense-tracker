@@ -24,6 +24,15 @@ export type UpdatePendingTransaction = z.infer<
   typeof UpdatePendingTransactionSchema
 >;
 
+export const TransactionFilterSchema = z.object({
+  operationType: z.enum(OperationType).optional(),
+  category: z.enum(Category).optional(),
+  status: z.enum(TransactionStatus).optional(),
+  search: z.string().trim().optional(),
+});
+
+export type TransactionFilter = z.infer<typeof TransactionFilterSchema>;
+
 export const TRANSACTION_SORT_FIELDS = [
   "date",
   "amount",

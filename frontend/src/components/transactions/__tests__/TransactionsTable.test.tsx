@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import {
@@ -8,7 +8,18 @@ import {
   Currency,
 } from "@expense-tracker/core";
 import type { Transaction } from "@/api/transactions";
-import TransactionList from "../TransactionList";
+import TransactionsTable from "../TransactionsTable";
+import { TransactionsFilterProvider } from "../../../context/TransactionsFilterContext";
+
+const mockDeleteTransaction = vi.fn();
+
+vi.mock("@/hooks/useTransactions", () => ({
+  useTransactions: vi.fn(),
+  useDeleteTransaction: vi.fn(() => ({ mutate: mockDeleteTransaction })),
+}));
+
+import { useTransactions } from "@/hooks/useTransactions";
+const mockUseTransactions = vi.mocked(useTransactions);
 
 const salary: Transaction = {
   id: "aaa-bbb-ccc-1111",
@@ -60,29 +71,41 @@ const pendingExpense: Transaction = {
 
 const ALL = [salary, groceries, pendingExpense];
 
-describe("TransactionList", () => {
+beforeEach(() => {
+  mockDeleteTransaction.mockClear();
+});
+
+function setupTransactions(data: Transaction[] = []) {
+  mockUseTransactions.mockReturnValue({ data } as ReturnType<typeof useTransactions>);
+}
+
+describe("TransactionsTable", () => {
   describe("empty state", () => {
     it("shows empty state message when no transactions", () => {
-      render(<TransactionList transactions={[]} onDelete={vi.fn()} />);
+      setupTransactions([]);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       expect(screen.getByText(/NO RECORDS FOUND/i)).toBeInTheDocument();
     });
 
     it("hides the table when no transactions", () => {
-      render(<TransactionList transactions={[]} onDelete={vi.fn()} />);
+      setupTransactions([]);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       expect(screen.queryByRole("table")).not.toBeInTheDocument();
     });
   });
 
   describe("rendering", () => {
     it("renders a row for each transaction", () => {
-      render(<TransactionList transactions={ALL} onDelete={vi.fn()} />);
+      setupTransactions(ALL);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       expect(screen.getByText("Monthly Salary")).toBeInTheDocument();
       expect(screen.getByText("Groceries")).toBeInTheDocument();
       expect(screen.getByText("Electric Bill")).toBeInTheDocument();
     });
 
     it("renders all table column headers", () => {
-      render(<TransactionList transactions={ALL} onDelete={vi.fn()} />);
+      setupTransactions(ALL);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       for (const heading of [
         "ID",
         "T·STAMP",
@@ -96,49 +119,54 @@ describe("TransactionList", () => {
     });
 
     it("derives short ID from the last 4 chars of the id", () => {
-      render(<TransactionList transactions={[salary]} onDelete={vi.fn()} />);
+      setupTransactions([salary]);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       expect(screen.getByText("TX-1111")).toBeInTheDocument();
     });
 
     it("formats date to YYYY-MM-DD", () => {
-      render(<TransactionList transactions={[salary]} onDelete={vi.fn()} />);
+      setupTransactions([salary]);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       expect(screen.getByText("2025-05-01")).toBeInTheDocument();
     });
 
     it("renders category badge for each row", () => {
-      render(<TransactionList transactions={ALL} onDelete={vi.fn()} />);
-      // Each category appears at least once (also present in dropdown options)
+      setupTransactions(ALL);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       expect(screen.getAllByText(Category.Salary).length).toBeGreaterThanOrEqual(1);
       expect(screen.getAllByText(Category.Food).length).toBeGreaterThanOrEqual(1);
       expect(screen.getAllByText(Category.Utilities).length).toBeGreaterThanOrEqual(1);
     });
 
     it("shows CONFIRMED status for confirmed transactions", () => {
-      render(<TransactionList transactions={[salary]} onDelete={vi.fn()} />);
+      setupTransactions([salary]);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       expect(screen.getByText("CONFIRMED")).toBeInTheDocument();
     });
 
     it("shows PENDING status for pending transactions", () => {
-      render(
-        <TransactionList transactions={[pendingExpense]} onDelete={vi.fn()} />
-      );
+      setupTransactions([pendingExpense]);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       expect(screen.getByText("PENDING")).toBeInTheDocument();
     });
 
     it("formats inflow amount with + prefix and currency", () => {
-      render(<TransactionList transactions={[salary]} onDelete={vi.fn()} />);
+      setupTransactions([salary]);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       expect(screen.getByText(/\+5,000\.00 RON/)).toBeInTheDocument();
     });
 
     it("formats outflow amount with − prefix and currency", () => {
-      render(<TransactionList transactions={[groceries]} onDelete={vi.fn()} />);
+      setupTransactions([groceries]);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       expect(screen.getByText(/−150\.50 RON/)).toBeInTheDocument();
     });
   });
 
   describe("delete button", () => {
     it("shows delete button only for pending transactions", () => {
-      render(<TransactionList transactions={ALL} onDelete={vi.fn()} />);
+      setupTransactions(ALL);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       const deleteButtons = screen.getAllByRole("button", { name: /delete/i });
       expect(deleteButtons).toHaveLength(1);
       expect(deleteButtons[0]).toHaveAttribute(
@@ -148,126 +176,42 @@ describe("TransactionList", () => {
     });
 
     it("does not show delete button for confirmed transactions", () => {
-      render(<TransactionList transactions={[salary]} onDelete={vi.fn()} />);
+      setupTransactions([salary]);
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
       expect(
         screen.queryByRole("button", { name: /delete/i })
       ).not.toBeInTheDocument();
     });
 
-    it("calls onDelete with the transaction id after confirmation", async () => {
+    it("calls deleteTransaction with the transaction id after confirmation", async () => {
+      setupTransactions([pendingExpense]);
       const user = userEvent.setup();
-      const onDelete = vi.fn();
       vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
 
-      render(
-        <TransactionList transactions={[pendingExpense]} onDelete={onDelete} />
-      );
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
 
       await user.click(screen.getByRole("button", { name: /delete/i }));
 
       expect(window.confirm).toHaveBeenCalledWith(
         `Delete "${pendingExpense.description}"?`
       );
-      expect(onDelete).toHaveBeenCalledWith(pendingExpense.id);
+      expect(mockDeleteTransaction).toHaveBeenCalledWith(pendingExpense.id);
 
       vi.unstubAllGlobals();
     });
 
-    it("does not call onDelete when user cancels the confirmation", async () => {
+    it("does not call deleteTransaction when user cancels", async () => {
+      setupTransactions([pendingExpense]);
       const user = userEvent.setup();
-      const onDelete = vi.fn();
       vi.stubGlobal("confirm", vi.fn().mockReturnValue(false));
 
-      render(
-        <TransactionList transactions={[pendingExpense]} onDelete={onDelete} />
-      );
+      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
 
       await user.click(screen.getByRole("button", { name: /delete/i }));
 
-      expect(onDelete).not.toHaveBeenCalled();
+      expect(mockDeleteTransaction).not.toHaveBeenCalled();
 
       vi.unstubAllGlobals();
-    });
-  });
-
-  describe("filter by flow type", () => {
-    it("shows all transactions by default", () => {
-      render(<TransactionList transactions={ALL} onDelete={vi.fn()} />);
-      expect(screen.getByText("Monthly Salary")).toBeInTheDocument();
-      expect(screen.getByText("Groceries")).toBeInTheDocument();
-      expect(screen.getByText("Electric Bill")).toBeInTheDocument();
-    });
-
-    it("filters to inflow only", async () => {
-      const user = userEvent.setup();
-      render(<TransactionList transactions={ALL} onDelete={vi.fn()} />);
-
-      await user.selectOptions(
-        screen.getAllByRole("combobox")[0],
-        OperationType.Inflow
-      );
-
-      expect(screen.getByText("Monthly Salary")).toBeInTheDocument();
-      expect(screen.queryByText("Groceries")).not.toBeInTheDocument();
-      expect(screen.queryByText("Electric Bill")).not.toBeInTheDocument();
-    });
-
-    it("filters to outflow only", async () => {
-      const user = userEvent.setup();
-      render(<TransactionList transactions={ALL} onDelete={vi.fn()} />);
-
-      await user.selectOptions(
-        screen.getAllByRole("combobox")[0],
-        OperationType.Outflow
-      );
-
-      expect(screen.queryByText("Monthly Salary")).not.toBeInTheDocument();
-      expect(screen.getByText("Groceries")).toBeInTheDocument();
-      expect(screen.getByText("Electric Bill")).toBeInTheDocument();
-    });
-
-    it("shows empty state when no transactions match flow filter", async () => {
-      const user = userEvent.setup();
-      render(<TransactionList transactions={[salary]} onDelete={vi.fn()} />);
-
-      await user.selectOptions(
-        screen.getAllByRole("combobox")[0],
-        OperationType.Outflow
-      );
-
-      expect(screen.getByText(/NO RECORDS FOUND/i)).toBeInTheDocument();
-    });
-  });
-
-  describe("filter by category", () => {
-    it("populates category dropdown from transactions", () => {
-      render(<TransactionList transactions={ALL} onDelete={vi.fn()} />);
-      const categorySelect = screen.getAllByRole("combobox")[1];
-      expect(
-        within(categorySelect).getByRole("option", { name: Category.Food })
-      ).toBeInTheDocument();
-      expect(
-        within(categorySelect).getByRole("option", { name: Category.Salary })
-      ).toBeInTheDocument();
-      expect(
-        within(categorySelect).getByRole("option", {
-          name: Category.Utilities,
-        })
-      ).toBeInTheDocument();
-    });
-
-    it("filters by a specific category", async () => {
-      const user = userEvent.setup();
-      render(<TransactionList transactions={ALL} onDelete={vi.fn()} />);
-
-      await user.selectOptions(
-        screen.getAllByRole("combobox")[1],
-        Category.Food
-      );
-
-      expect(screen.getByText("Groceries")).toBeInTheDocument();
-      expect(screen.queryByText("Monthly Salary")).not.toBeInTheDocument();
-      expect(screen.queryByText("Electric Bill")).not.toBeInTheDocument();
     });
   });
 });

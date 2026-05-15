@@ -1,25 +1,33 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type TransactionSort } from "@expense-tracker/core";
+import {
+  type TransactionSort,
+  type TransactionFilter,
+} from "@expense-tracker/core";
 import { transactionsApi, type Transaction } from "@/api/transactions";
 
 export type { Transaction };
 
-export const transactionsQueryKey = (sort?: TransactionSort) =>
-  ["transactions", sort] as const;
+export const transactionsQueryKey = (
+  sort?: TransactionSort,
+  filter?: TransactionFilter
+) => ["transactions", sort, filter] as const;
 
-export function useTransactions(sort?: TransactionSort) {
+export function useTransactions(
+  sort?: TransactionSort,
+  filter?: TransactionFilter
+) {
   return useQuery({
-    queryKey: transactionsQueryKey(sort),
-    queryFn: () => transactionsApi.fetchAll(sort),
+    queryKey: transactionsQueryKey(sort, filter),
+    queryFn: ({ signal }) => transactionsApi.fetchAll(sort, filter, signal),
   });
 }
 
-export function useDeleteTransaction(sort?: TransactionSort) {
+export function useDeleteTransaction() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => transactionsApi.remove(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: transactionsQueryKey(sort) });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
   });
 }

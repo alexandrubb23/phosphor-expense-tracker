@@ -10,11 +10,7 @@ import {
 } from "recharts";
 import { OperationType } from "@expense-tracker/core";
 import { CATEGORY_COLORS, CATEGORY_COLOR_FALLBACK } from "../../categoryColors";
-import { Transaction } from "../../api/transactions";
-
-interface SpendingByCategoryProps {
-  transactions: Transaction[];
-}
+import { useTransactions } from "../../hooks/useTransactions";
 
 interface ChartEntry {
   name: string;
@@ -48,7 +44,8 @@ function CustomTooltip({
   );
 }
 
-function SpendingByCategory({ transactions }: SpendingByCategoryProps) {
+function SpendingByCategory() {
+  const { data: transactions = [] } = useTransactions();
   const totalsByCategory = transactions
     .filter((t) => t.operationType === OperationType.Outflow)
     .reduce<Record<string, number>>((acc, t) => {

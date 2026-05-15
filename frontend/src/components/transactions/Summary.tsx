@@ -1,12 +1,9 @@
 import { OperationType } from "@expense-tracker/core";
-import { Transaction } from "../../api/transactions";
 import { useCountUp } from "../../hooks/useCountUp";
+import { useTransactions } from "../../hooks/useTransactions";
 
-interface SummaryProps {
-  transactions: Transaction[];
-}
-
-function Summary({ transactions }: SummaryProps) {
+function Summary() {
+  const { data: transactions = [] } = useTransactions();
   const totalIncome = transactions
     .filter((t) => t.operationType === OperationType.Inflow)
     .reduce((sum, t) => sum + Number(t.amount), 0);

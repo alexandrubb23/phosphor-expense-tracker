@@ -1,11 +1,5 @@
-import { useState } from "react";
-import { type SortingState } from "@tanstack/react-table";
 import { useSession } from "../lib/auth-client";
 import { useIsAdmin } from "../hooks/useIsAdmin";
-import {
-  useTransactions,
-  useDeleteTransaction,
-} from "../hooks/useTransactions";
 import Masthead from "../components/ui/Masthead";
 import NavButton from "../components/ui/NavButton";
 import SectionHead from "../components/ui/SectionHead";
@@ -13,26 +7,14 @@ import SignOutButton from "../components/auth/SignOutButton";
 import Summary from "../components/transactions/Summary";
 import SpendingByCategory from "../components/transactions/SpendingByCategory";
 import TransactionForm from "../components/transactions/TransactionForm";
-import TransactionList from "../components/transactions/TransactionList";
+import TransactionFilters from "../components/transactions/TransactionFilters";
+import TransactionsTable from "../components/transactions/TransactionsTable";
 import HealthStatus from "../components/ui/HealthStatus";
 import { NewTransaction, CATEGORIES } from "../types";
-import { type TransactionSortField, SortDir } from "@expense-tracker/core";
+import { TransactionsFilterProvider } from "../context/TransactionsFilterContext";
 
 export default function HomePage() {
   const { data: session } = useSession();
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "date", desc: true },
-  ]);
-
-  const sort = sorting[0]
-    ? {
-        sortBy: sorting[0].id as TransactionSortField,
-        sortDir: sorting[0].desc ? SortDir.desc : SortDir.asc,
-      }
-    : undefined;
-
-  const { data: transactions = [], isLoading, isError } = useTransactions(sort);
-  const { mutate: deleteTransaction } = useDeleteTransaction(sort);
 
   const addTransaction = (_transaction: NewTransaction) => {
     // TODO: wire up POST /api/transactions when manual entry is implemented
@@ -54,13 +36,7 @@ export default function HomePage() {
         }
       />
 
-      {isError && (
-        <p className="mb-6 border border-red bg-panel px-4 py-3 font-mono text-[12px] uppercase tracking-widest text-red">
-          ⚠ FAILED TO LOAD TRANSACTIONS
-        </p>
-      )}
-
-      <Summary transactions={transactions} />
+      <Summary />
 
       <section className="mb-17 opacity-0 animate-fade-up [animation-delay:0.5s]">
         <SectionHead
@@ -73,7 +49,7 @@ export default function HomePage() {
             </>
           }
         />
-        <SpendingByCategory transactions={transactions} />
+        <SpendingByCategory />
       </section>
 
       <section className="mb-17 opacity-0 animate-fade-up [animation-delay:0.65s]">
@@ -89,23 +65,12 @@ export default function HomePage() {
         <SectionHead
           eyebrow="04 / 04"
           title="Transaction Archive"
-          status={
-            isLoading ? (
-              "LOADING…"
-            ) : (
-              <>
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-green shadow-[0_0_8px_rgba(77,255,170,0.4)]" />
-                {transactions.length} REC
-              </>
-            )
-          }
+          status="LIVE"
         />
-        <TransactionList
-          transactions={transactions}
-          onDelete={deleteTransaction}
-          sorting={sorting}
-          onSortingChange={setSorting}
-        />
+        <TransactionsFilterProvider>
+          <TransactionFilters />
+          <TransactionsTable />
+        </TransactionsFilterProvider>
       </section>
 
       <HealthStatus />

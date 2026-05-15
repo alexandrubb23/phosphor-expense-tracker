@@ -4,6 +4,7 @@ import { validate } from "../../lib/validate.js";
 import {
   UpdatePendingTransactionSchema,
   TransactionSortSchema,
+  TransactionFilterSchema,
   TransactionStatus,
 } from "@expense-tracker/core";
 import {
@@ -30,11 +31,21 @@ async function requirePendingTransaction(id: string, userId: string) {
 
 router.get("/", async (req, res) => {
   const { sortBy, sortDir } = validate(TransactionSortSchema, req.query);
+  const { operationType, category, status, search } = validate(
+    TransactionFilterSchema,
+    req.query
+  );
 
   const transactions = await prisma.transaction.findMany({
     where: {
       userId: req.user!.id,
       deletedAt: null,
+      ...(operationType ? { operationType } : {}),
+      ...(category ? { category } : {}),
+      ...(status ? { status } : {}),
+      ...(search
+        ? { description: { contains: search, mode: "insensitive" } }
+        : {}),
     },
     orderBy: [{ [sortBy]: sortDir }, { createdAt: sortDir }],
   });
