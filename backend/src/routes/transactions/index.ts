@@ -3,20 +3,16 @@ import { getPrisma } from "../../lib/prisma.js";
 import { validate } from "../../lib/validate.js";
 import {
   CreateTransactionSchema,
-  UpdatePendingTransactionSchema,
+  UpdateTransactionSchema,
   TransactionSortSchema,
   TransactionFilterSchema,
   TransactionPaginationSchema,
   TransactionSummaryQuerySchema,
-  TransactionStatus,
   OperationType,
   SummaryPeriod,
   type SummaryPeriod as SummaryPeriodType,
 } from "@expense-tracker/core";
-import {
-  HttpNotFoundError,
-  HttpBadRequestError,
-} from "../../lib/http-errors.js";
+import { HttpNotFoundError } from "../../lib/http-errors.js";
 
 const router = Router();
 const prisma = getPrisma();
@@ -52,16 +48,6 @@ async function requireOwnedTransaction(id: string, userId: string) {
 
   if (!tx || tx.userId !== userId || tx.deletedAt !== null) {
     throw new HttpNotFoundError("Transaction not found");
-  }
-
-  return tx;
-}
-
-async function requirePendingTransaction(id: string, userId: string) {
-  const tx = await requireOwnedTransaction(id, userId);
-
-  if (tx.status !== TransactionStatus.Pending) {
-    throw new HttpBadRequestError("Transaction is not pending");
   }
 
   return tx;
@@ -162,9 +148,9 @@ router.get("/", async (req, res) => {
 });
 
 router.patch("/:id", async (req, res) => {
-  await requirePendingTransaction(req.params.id, req.user!.id);
+  await requireOwnedTransaction(req.params.id, req.user!.id);
 
-  const updates = validate(UpdatePendingTransactionSchema, req.body);
+  const updates = validate(UpdateTransactionSchema, req.body);
   const updated = await prisma.transaction.update({
     where: { id: req.params.id },
     data: {

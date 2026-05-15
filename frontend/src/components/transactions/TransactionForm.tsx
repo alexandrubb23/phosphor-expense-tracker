@@ -7,24 +7,15 @@ import {
   Currency,
   TransactionStatus,
 } from "@expense-tracker/core";
-import { AxiosError } from "axios";
 import { useCreateTransaction } from "@/hooks/useTransactions";
+import { getErrorMessage } from "@/lib/getErrorMessage";
+import { transactionFormSchema } from "./transactionFormSchema";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-// Local form schema — avoids optional().default() resolver mismatch and keeps date as string
-const formSchema = z.object({
-  description: z
-    .string()
-    .trim()
-    .min(1, "Description is required")
-    .max(200, "Description must be 200 characters or fewer"),
-  amount: z.number().positive("Amount must be greater than 0"),
-  operationType: z.enum(OperationType),
-  category: z.enum(Category),
-  date: z.string().min(1, "Date is required"),
+// Extend the shared schema with `currency` (only needed for creating a transaction)
+const formSchema = transactionFormSchema.extend({
   currency: z.enum(Currency),
-  status: z.enum(TransactionStatus),
 });
 
 type FormFields = z.infer<typeof formSchema>;
@@ -82,12 +73,9 @@ export default function TransactionForm() {
       await createTransaction({ ...data, date: new Date(data.date) });
       reset();
     } catch (err) {
-      const message =
-        err instanceof AxiosError
-          ? ((err.response?.data?.error as string | undefined) ??
-            "Failed to create transaction")
-          : "Failed to create transaction";
-      setError("root", { message });
+      setError("root", {
+        message: getErrorMessage(err, "Failed to create transaction"),
+      });
     }
   };
 

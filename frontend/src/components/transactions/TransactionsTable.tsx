@@ -21,6 +21,7 @@ import {
 } from "../../hooks/useTransactions";
 import { useTransactionsFilter } from "../../context/TransactionsFilterContext";
 import ConfirmDeleteModal from "../ui/ConfirmDeleteModal";
+import EditTransactionModal from "./EditTransactionModal";
 
 function SortIcon({ isSorted }: { isSorted: false | SortDir }) {
   if (isSorted === SortDir.asc)
@@ -84,9 +85,14 @@ function TransactionsTable() {
   const { mutateAsync: deleteTransaction } = useDeleteTransaction();
 
   const [pendingDelete, setPendingDelete] = useState<Transaction | null>(null);
+  const [pendingEdit, setPendingEdit] = useState<Transaction | null>(null);
 
   const handleDelete = useCallback((transaction: Transaction) => {
     setPendingDelete(transaction);
+  }, []);
+
+  const handleEdit = useCallback((transaction: Transaction) => {
+    setPendingEdit(transaction);
   }, []);
 
   const columns = useMemo(
@@ -163,19 +169,29 @@ function TransactionsTable() {
         cell: (info) => {
           const t = info.row.original;
           return (
-            <button
-              className="inline-flex h-6.5 w-6.5 items-center justify-center border border-hairline-glow bg-transparent font-mono text-sm leading-none text-muted transition-all duration-200 hover:border-red hover:bg-red hover:text-bg-deep hover:shadow-[0_0_16px_rgba(255,58,92,0.5)]"
-              onClick={() => handleDelete(t)}
-              aria-label={`Delete ${t.description}`}
-              title="Purge"
-            >
-              ×
-            </button>
+            <div className="flex items-center justify-end gap-1.5">
+              <button
+                className="inline-flex h-6.5 w-6.5 items-center justify-center border border-hairline-glow bg-transparent font-mono text-[13px] leading-none text-muted transition-all duration-200 hover:border-cyan hover:bg-cyan hover:text-bg-deep hover:shadow-[0_0_16px_rgba(0,229,255,0.5)]"
+                onClick={() => handleEdit(t)}
+                aria-label={`Edit ${t.description}`}
+                title="Edit"
+              >
+                ✎
+              </button>
+              <button
+                className="inline-flex h-6.5 w-6.5 items-center justify-center border border-hairline-glow bg-transparent font-mono text-sm leading-none text-muted transition-all duration-200 hover:border-red hover:bg-red hover:text-bg-deep hover:shadow-[0_0_16px_rgba(255,58,92,0.5)]"
+                onClick={() => handleDelete(t)}
+                aria-label={`Delete ${t.description}`}
+                title="Purge"
+              >
+                ×
+              </button>
+            </div>
           );
         },
       }),
     ],
-    [handleDelete]
+    [handleDelete, handleEdit]
   );
 
   const table = useReactTable({
@@ -351,6 +367,13 @@ function TransactionsTable() {
           onConfirm={() => deleteTransaction(pendingDelete.id)}
           onClose={() => setPendingDelete(null)}
           fallbackError="Failed to delete transaction"
+        />
+      )}
+
+      {pendingEdit && (
+        <EditTransactionModal
+          transaction={pendingEdit}
+          onClose={() => setPendingEdit(null)}
         />
       )}
     </div>

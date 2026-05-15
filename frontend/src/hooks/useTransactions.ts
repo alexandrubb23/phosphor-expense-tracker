@@ -5,6 +5,7 @@ import {
   type TransactionPagination,
   type TransactionSummaryQuery,
   type CreateTransaction,
+  type UpdateTransaction,
 } from "@expense-tracker/core";
 import { transactionsApi, type Transaction } from "@/api/transactions";
 
@@ -39,6 +40,17 @@ export function useCreateTransaction() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateTransaction) => transactionsApi.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    },
+  });
+}
+
+export function useUpdateTransaction() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateTransaction }) =>
+      transactionsApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AxiosError } from "axios";
+import { getErrorMessage } from "@/lib/getErrorMessage";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -35,10 +35,7 @@ export default function ConfirmDeleteModal({
       await onConfirm();
       onClose();
     } catch (err) {
-      const message =
-        err instanceof AxiosError
-          ? ((err.response?.data?.error as string | undefined) ?? fallbackError)
-          : fallbackError;
+      const message = getErrorMessage(err, fallbackError);
       setError(message);
     } finally {
       setIsPending(false);

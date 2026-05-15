@@ -22,25 +22,26 @@ export const CreateTransactionSchema = z.object({
 
 export type CreateTransaction = z.infer<typeof CreateTransactionSchema>;
 
-const transactionFields = {
-  description: z.string().trim().min(1).optional(),
-  amount: z.number().positive().optional(),
-  operationType: z.enum(OperationType).optional(),
-  category: z.enum(Category).optional(),
-  subcategory: z.string().trim().nullable().optional(),
-  date: z.iso.datetime().optional(),
-  status: z.enum(TransactionStatus).optional(),
-};
-
-export const UpdatePendingTransactionSchema = z
-  .object(transactionFields)
+export const UpdateTransactionSchema = z
+  .object({
+    description: z.string().trim().min(1).max(200).optional(),
+    amount: z.number().positive().optional(),
+    operationType: z.enum(OperationType).optional(),
+    category: z.enum(Category).optional(),
+    subcategory: z.string().trim().nullable().optional(),
+    date: z.string().optional(),
+    status: z.enum(TransactionStatus).optional(),
+  })
   .refine((data) => Object.keys(data).length > 0, {
     message: "At least one field must be provided",
   });
 
-export type UpdatePendingTransaction = z.infer<
-  typeof UpdatePendingTransactionSchema
->;
+export type UpdateTransaction = z.infer<typeof UpdateTransactionSchema>;
+
+/** @deprecated use UpdateTransactionSchema */
+export const UpdatePendingTransactionSchema = UpdateTransactionSchema;
+/** @deprecated use UpdateTransaction */
+export type UpdatePendingTransaction = UpdateTransaction;
 
 export const TransactionFilterSchema = z.object({
   operationType: z.enum(OperationType).optional(),

@@ -1,7 +1,6 @@
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AxiosError } from "axios";
 import { useEventListener } from "usehooks-ts";
 import {
   createUserSchema,
@@ -14,6 +13,7 @@ import FormRootError from "@/components/ui/FormRootError";
 import { useCreateUser } from "@/hooks/useCreateUser";
 import { useUpdateUser } from "@/hooks/useUpdateUser";
 import type { User } from "@/api/users";
+import { getErrorMessage } from "@/lib/getErrorMessage";
 
 interface UserFormModalProps {
   user?: User;
@@ -58,12 +58,12 @@ export default function UserFormModal({ user, onClose }: UserFormModalProps) {
       }
       onClose();
     } catch (err) {
-      const message =
-        err instanceof AxiosError
-          ? ((err.response?.data?.error as string | undefined) ??
-            `Failed to ${isEdit ? "update" : "create"} user`)
-          : `Failed to ${isEdit ? "update" : "create"} user`;
-      setError("root", { message });
+      setError("root", {
+        message: getErrorMessage(
+          err,
+          `Failed to ${isEdit ? "update" : "create"} user`
+        ),
+      });
     }
   };
 

@@ -10,6 +10,7 @@ import {
   type TransactionSummaryQuery,
   type TransactionSummary,
   type CreateTransaction,
+  type UpdateTransaction,
 } from "@expense-tracker/core";
 import { Http } from "./http";
 
@@ -59,6 +60,14 @@ class TransactionsApi extends Http {
   async create(data: CreateTransaction): Promise<Transaction> {
     const { data: transaction } = await this.http.post<Transaction>(
       this.path,
+      data
+    );
+    return transaction;
+  }
+
+  async update(id: string, data: UpdateTransaction): Promise<Transaction> {
+    const { data: transaction } = await this.http.patch<Transaction>(
+      `${this.path}/${id}`,
       data
     );
     return transaction;
