@@ -9,16 +9,11 @@ import {
 } from "@expense-tracker/core";
 import { env } from "../env.js";
 
-const SYSTEM_PROMPT = `You are a financial transaction extractor. Given an email subject and body, extract the transaction details as structured data.
-
-Rules:
-- description: a concise, human-readable description of the transaction (e.g. "Mega Image — food and drink")
-- amount: a positive number (never negative)
-- operationType: "${OperationType.Inflow}" for income/deposits, "${OperationType.Outflow}" for expenses/payments
-- category: one of ${Object.values(Category).join(", ")}
-- subcategory: optional, only if clearly stated
-- date: ISO date string (YYYY-MM-DD) if mentioned, otherwise omit
-- confidence: set to "high" if ALL required fields (description, amount, operationType, category) are clearly and unambiguously present; set to "low" if any required field is uncertain, missing, or ambiguous`;
+const SYSTEM_PROMPT = `Extract financial transaction details from the email.
+- description: concise "merchant — item/type" format (e.g. "Mega Image — food and drink"); never echo the raw input verbatim
+- operationType: "${OperationType.Inflow}" = income/deposit, "${OperationType.Outflow}" = expense/payment
+- date: YYYY-MM-DD if present, otherwise omit
+- confidence: "${Confidence.High}" only when description, amount, operationType, and category are all unambiguous; otherwise "${Confidence.Low}"`;
 
 const STUB: EmailTransaction = {
   description: "[AI disabled] stub transaction",
