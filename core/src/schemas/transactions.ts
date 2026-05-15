@@ -12,7 +12,7 @@ export const CreateTransactionSchema = z.object({
   operationType: z.enum(OperationType),
   category: z.enum(Category),
   subcategory: z.string().trim().nullable().optional(),
-  date: z.date(),
+  date: z.coerce.date(),
   currency: z.enum(Currency).optional().default(Currency.RON),
   status: z
     .enum(TransactionStatus)
