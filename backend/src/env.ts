@@ -18,7 +18,10 @@ export const env = createEnv({
     SEED_ADMIN_PASSWORD: z.string().min(8).optional(),
     OPENAI_API_KEY: z.string().min(1).optional(),
     WEBHOOK_SECRET: z.string().optional(),
-    DISABLE_AI: z.coerce.boolean().default(false),
+    DISABLE_AI: z
+      .enum(["true", "false", "1", "0"])
+      .transform((v) => v === "true" || v === "1")
+      .default(false),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,

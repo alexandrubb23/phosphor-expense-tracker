@@ -1,4 +1,4 @@
-import { generateObject } from "ai";
+import { generateText, tool } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import {
   EmailTransactionSchema,
@@ -41,12 +41,18 @@ export async function extractTransaction(
 
   const openai = createOpenAI({ apiKey: env.OPENAI_API_KEY! });
 
-  const { object } = await generateObject({
-    model: openai("gpt-4o"),
-    schema: EmailTransactionSchema,
+  const { toolCalls } = await generateText({
+    model: openai("gpt-5-nano"),
     system: SYSTEM_PROMPT,
     prompt: `Subject: ${subject}\n\nBody:\n${body}`,
+    tools: {
+      extractTransaction: tool({
+        description: "Extract transaction details from the email",
+        inputSchema: EmailTransactionSchema,
+      }),
+    },
+    toolChoice: { type: "tool", toolName: "extractTransaction" },
   });
 
-  return object;
+  return EmailTransactionSchema.parse(toolCalls[0].input);
 }
