@@ -7,12 +7,12 @@ import {
   TransactionStatus,
 } from "@expense-tracker/core";
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { type Transaction } from "@/api/transactions";
 import { useUpdateTransaction } from "@/hooks/useTransactions";
 import { getErrorMessage } from "@/lib/getErrorMessage";
@@ -94,25 +94,25 @@ export default function EditTransactionModal({
     errors.description || errors.amount || errors.date || serverError;
 
   return (
-    <AlertDialog open onOpenChange={(open) => !open && onClose()}>
-      <AlertDialogContent className="max-w-lg rounded-none border border-hairline-glow bg-surface p-8 shadow-[0_0_60px_rgba(0,229,255,0.08)]">
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-lg rounded-none border border-hairline-glow bg-surface p-8 shadow-[0_0_60px_rgba(0,229,255,0.08)]">
         {/* Corner accents */}
         <span className="pointer-events-none absolute -top-px -left-px h-3 w-3 border-t border-l border-cyan" />
         <span className="pointer-events-none absolute -right-px -bottom-px h-3 w-3 border-b border-r border-cyan" />
 
-        <AlertDialogHeader className="mb-6 flex flex-row items-center justify-between gap-0 place-items-start text-left">
-          <AlertDialogTitle className="font-mono text-[13px] font-medium uppercase tracking-[0.22em] text-ink">
+        <DialogHeader className="mb-6 flex flex-row items-center justify-between gap-0 place-items-start text-left">
+          <DialogTitle className="font-mono text-[13px] font-medium uppercase tracking-[0.22em] text-ink">
             Edit Transaction
-          </AlertDialogTitle>
-          <AlertDialogCancel
+          </DialogTitle>
+          <DialogClose
             variant="ghost"
             size="sm"
             disabled={isSubmitting}
             className="h-auto p-0 font-mono text-[11px] tracking-[0.2em] text-muted hover:bg-transparent hover:text-cyan"
           >
             ✕ CLOSE
-          </AlertDialogCancel>
-        </AlertDialogHeader>
+          </DialogClose>
+        </DialogHeader>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -206,12 +206,12 @@ export default function EditTransactionModal({
           )}
 
           <div className="mt-2 flex gap-3">
-            <AlertDialogCancel
+            <DialogClose
               disabled={isSubmitting}
               className="flex-1 rounded-none border border-hairline bg-transparent py-3 font-mono text-[11px] uppercase tracking-[0.28em] text-muted hover:border-cyan hover:bg-transparent hover:text-cyan disabled:cursor-not-allowed disabled:opacity-50"
             >
               CANCEL
-            </AlertDialogCancel>
+            </DialogClose>
             <button
               type="submit"
               disabled={isSubmitting}
@@ -221,7 +221,7 @@ export default function EditTransactionModal({
             </button>
           </div>
         </form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 }

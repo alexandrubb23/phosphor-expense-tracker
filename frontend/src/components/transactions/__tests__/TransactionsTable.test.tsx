@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import {
@@ -17,10 +17,12 @@ import TransactionsTable from "../TransactionsTable";
 import { TransactionsFilterProvider } from "../../../context/TransactionsFilterContext";
 
 const mockDeleteTransaction = vi.fn().mockResolvedValue(undefined);
+const mockUpdateTransaction = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@/hooks/useTransactions", () => ({
   useTransactions: vi.fn(),
   useDeleteTransaction: vi.fn(() => ({ mutateAsync: mockDeleteTransaction })),
+  useUpdateTransaction: vi.fn(() => ({ mutateAsync: mockUpdateTransaction })),
 }));
 
 import { useTransactions } from "@/hooks/useTransactions";
@@ -78,6 +80,7 @@ const ALL = [salary, groceries, pendingExpense];
 
 beforeEach(() => {
   mockDeleteTransaction.mockClear();
+  mockUpdateTransaction.mockClear();
 });
 
 function setupTransactions(data: Transaction[] = []) {
@@ -247,6 +250,87 @@ describe("TransactionsTable", () => {
       await user.click(screen.getByRole("button", { name: /cancel/i }));
 
       expect(mockDeleteTransaction).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("edit button", () => {
+    it("shows an edit button for every transaction", () => {
+      setupTransactions(ALL);
+      renderTransactionsTable();
+      const editButtons = screen.getAllByRole("button", { name: /edit/i });
+      expect(editButtons).toHaveLength(ALL.length);
+    });
+
+    it("shows edit button with accessible label per transaction", () => {
+      setupTransactions([salary]);
+      renderTransactionsTable();
+      expect(
+        screen.getByRole("button", { name: `Edit ${salary.description}` })
+      ).toBeInTheDocument();
+    });
+
+    it("opens edit dialog when edit button is clicked", async () => {
+      setupTransactions([salary]);
+      const user = userEvent.setup();
+      renderTransactionsTable();
+
+      await user.click(
+        screen.getByRole("button", { name: `Edit ${salary.description}` })
+      );
+
+      expect(screen.getByText("Edit Transaction")).toBeInTheDocument();
+    });
+
+    it("pre-fills edit dialog with the transaction's values", async () => {
+      setupTransactions([salary]);
+      const user = userEvent.setup();
+      renderTransactionsTable();
+
+      await user.click(
+        screen.getByRole("button", { name: `Edit ${salary.description}` })
+      );
+
+      expect(screen.getByDisplayValue(salary.description)).toBeInTheDocument();
+      expect(
+        screen.getByDisplayValue(Number(salary.amount))
+      ).toBeInTheDocument();
+    });
+
+    it("hides edit dialog when Escape is pressed", async () => {
+      setupTransactions([salary]);
+      const user = userEvent.setup();
+      renderTransactionsTable();
+
+      await user.click(
+        screen.getByRole("button", { name: `Edit ${salary.description}` })
+      );
+      expect(screen.getByText("Edit Transaction")).toBeInTheDocument();
+
+      await user.keyboard("{Escape}");
+
+      await waitFor(() =>
+        expect(screen.queryByText("Edit Transaction")).not.toBeInTheDocument()
+      );
+    });
+
+    it("hides edit dialog when clicking outside", async () => {
+      setupTransactions([salary]);
+      const user = userEvent.setup();
+      const { baseElement } = renderTransactionsTable();
+
+      await user.click(
+        screen.getByRole("button", { name: `Edit ${salary.description}` })
+      );
+      expect(screen.getByText("Edit Transaction")).toBeInTheDocument();
+
+      const backdrop = baseElement.querySelector(
+        '[data-slot="dialog-overlay"]'
+      );
+      await user.click(backdrop!);
+
+      await waitFor(() =>
+        expect(screen.queryByText("Edit Transaction")).not.toBeInTheDocument()
+      );
     });
   });
 
