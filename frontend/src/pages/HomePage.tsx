@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { type SortingState } from "@tanstack/react-table";
 import { useSession } from "../lib/auth-client";
 import { useIsAdmin } from "../hooks/useIsAdmin";
 import {
@@ -14,11 +16,23 @@ import TransactionForm from "../components/transactions/TransactionForm";
 import TransactionList from "../components/transactions/TransactionList";
 import HealthStatus from "../components/ui/HealthStatus";
 import { NewTransaction, CATEGORIES } from "../types";
+import { type TransactionSortField, SortDir } from "@expense-tracker/core";
 
 export default function HomePage() {
   const { data: session } = useSession();
-  const { data: transactions = [], isLoading, isError } = useTransactions();
-  const { mutate: deleteTransaction } = useDeleteTransaction();
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "date", desc: true },
+  ]);
+
+  const sort = sorting[0]
+    ? {
+        sortBy: sorting[0].id as TransactionSortField,
+        sortDir: sorting[0].desc ? SortDir.desc : SortDir.asc,
+      }
+    : undefined;
+
+  const { data: transactions = [], isLoading, isError } = useTransactions(sort);
+  const { mutate: deleteTransaction } = useDeleteTransaction(sort);
 
   const addTransaction = (_transaction: NewTransaction) => {
     // TODO: wire up POST /api/transactions when manual entry is implemented
@@ -89,6 +103,8 @@ export default function HomePage() {
         <TransactionList
           transactions={transactions}
           onDelete={deleteTransaction}
+          sorting={sorting}
+          onSortingChange={setSorting}
         />
       </section>
 

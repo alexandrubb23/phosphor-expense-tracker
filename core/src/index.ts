@@ -3,6 +3,7 @@ export * from "./schemas/email-transaction.js";
 export * from "./schemas/whitelist.js";
 export * from "./schemas/transactions.js";
 export * from "./enums/roles.js";
+export * from "./enums/sort-dir.js";
 export * from "./constants/transaction-status.js";
 export * from "./constants/operation-type.js";
 export * from "./constants/category.js";

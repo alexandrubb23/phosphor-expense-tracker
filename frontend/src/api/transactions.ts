@@ -1,4 +1,4 @@
-import { OperationType, Category, TransactionStatus, Currency } from "@expense-tracker/core";
+import { OperationType, Category, TransactionStatus, Currency, type TransactionSort } from "@expense-tracker/core";
 import { Http } from "./http";
 
 export interface Transaction {
@@ -20,8 +20,10 @@ export interface Transaction {
 class TransactionsApi extends Http {
   private readonly path = "/api/transactions";
 
-  async fetchAll(): Promise<Transaction[]> {
-    const { data } = await this.http.get<Transaction[]>(this.path);
+  async fetchAll(sort?: TransactionSort): Promise<Transaction[]> {
+    const { data } = await this.http.get<Transaction[]>(this.path, {
+      params: sort,
+    });
     return data;
   }
 

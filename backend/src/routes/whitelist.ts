@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { getPrisma } from "../lib/prisma.js";
 import { validate } from "../lib/validate.js";
-import { CreateWhitelistEntrySchema } from "@expense-tracker/core";
+import { CreateWhitelistEntrySchema, SortDir } from "@expense-tracker/core";
 import { HttpNotFoundError, HttpConflictError } from "../lib/http-errors.js";
 
 const router = Router();
@@ -10,7 +10,7 @@ const prisma = getPrisma();
 router.get("/", async (req, res) => {
   const entries = await prisma.senderWhitelist.findMany({
     where: { userId: req.user!.id },
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: SortDir.asc },
   });
 
   res.json(entries);

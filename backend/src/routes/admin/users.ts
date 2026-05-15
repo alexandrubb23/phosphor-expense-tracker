@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { randomUUID } from "crypto";
 import { hashPassword } from "better-auth/crypto";
-import { createUserSchema, editUserSchema, Role } from "@expense-tracker/core";
+import { createUserSchema, editUserSchema, Role, SortDir } from "@expense-tracker/core";
 import { getPrisma } from "../../lib/prisma.js";
 import { validate } from "../../lib/validate.js";
 import {
@@ -24,7 +24,7 @@ router.get("/", async (_req, res) => {
       emailVerified: true,
       createdAt: true,
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: SortDir.desc },
   });
 
   res.json({ users });
