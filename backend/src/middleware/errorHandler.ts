@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { HttpError } from "../lib/http-errors";
+import { HttpCodeError } from "../lib/http-errors";
 
 /**
  * Global Express error handler — must be registered as the last middleware.
@@ -8,7 +8,7 @@ import { HttpError } from "../lib/http-errors";
  * consistent JSON `{ error }` response, preventing stack traces or HTML error
  * pages from leaking internal details to clients.
  *
- * - `HttpError` subclasses: respond with their status code and response body.
+ * - `HttpCodeError` subclasses: respond with their status code and response body.
  * - Unknown errors: log and respond with a generic 500 message (never leaks
  *   internal details to the client).
  */
@@ -18,7 +18,7 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ): void => {
-  if (err instanceof HttpError) {
+  if (err instanceof HttpCodeError) {
     res.status(err.statusCode).json({ error: err.responseBody });
     return;
   }

@@ -15,21 +15,81 @@ enum Role {
   user
 }
 
+enum OperationType {
+  Inflow
+  Outflow
+}
+
+enum TransactionStatus {
+  confirmed
+  pending
+}
+
+enum Category {
+  Food
+  Housing
+  Utilities
+  Transport
+  Entertainment
+  Salary
+  Other
+}
+
+enum Currency {
+  RON
+}
+
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  role          Role      @default(user)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  deletedAt     DateTime?
-  sessions      Session[]
-  accounts      Account[]
+  id                String              @id
+  name              String
+  email             String
+  emailVerified     Boolean             @default(false)
+  image             String?
+  role              Role                @default(user)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  deletedAt         DateTime?
+  sessions          Session[]
+  accounts          Account[]
+  transactions      Transaction[]
+  senderWhitelist   SenderWhitelist[]
 
   @@unique([email])
   @@map("user")
+}
+
+model Transaction {
+  id            String            @id @default(cuid())
+  userId        String
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  description   String
+  amount        Decimal           @db.Decimal(12, 2)
+  operationType OperationType
+  category      Category
+  subcategory   String?
+  currency      Currency          @default(RON)
+  status        TransactionStatus @default(confirmed)
+  date          DateTime
+  rawEmailBody  String?
+  deletedAt     DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("transaction")
+}
+
+model SenderWhitelist {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  senderEmail String
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, senderEmail])
+  @@index([senderEmail])
+  @@map("sender_whitelist")
 }
 
 model Session {
