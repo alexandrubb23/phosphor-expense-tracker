@@ -3,6 +3,7 @@ import { OperationType } from "../constants/operation-type.js";
 import { Category } from "../constants/category.js";
 import { TransactionStatus } from "../constants/transaction-status.js";
 import { SortDir } from "../enums/sort-dir.js";
+import { SummaryPeriod } from "../enums/summary-period.js";
 
 const transactionFields = {
   description: z.string().trim().min(1).optional(),
@@ -32,6 +33,47 @@ export const TransactionFilterSchema = z.object({
 });
 
 export type TransactionFilter = z.infer<typeof TransactionFilterSchema>;
+
+export const TransactionPaginationSchema = z.object({
+  page: z.coerce.number().int().positive().optional().default(1),
+  pageSize: z.coerce.number().int().positive().max(1000).optional().default(10),
+});
+
+export type TransactionPagination = z.infer<typeof TransactionPaginationSchema>;
+
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export const SUMMARY_PERIODS = Object.values(SummaryPeriod) as [
+  SummaryPeriod,
+  ...SummaryPeriod[],
+];
+
+export const TransactionSummaryQuerySchema = z.object({
+  period: z.enum(SUMMARY_PERIODS).optional().default(SummaryPeriod.month),
+  from: z.string().optional(),
+  to: z.string().optional(),
+});
+
+export type TransactionSummaryQuery = z.infer<
+  typeof TransactionSummaryQuerySchema
+>;
+
+export interface CategoryTotal {
+  category: string;
+  total: number;
+}
+
+export interface TransactionSummary {
+  totalInflow: number;
+  totalOutflow: number;
+  byCategory: CategoryTotal[];
+}
 
 export const TRANSACTION_SORT_FIELDS = [
   "date",

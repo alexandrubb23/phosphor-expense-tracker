@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   type TransactionSort,
   type TransactionFilter,
+  type TransactionPagination,
+  type TransactionSummaryQuery,
 } from "@expense-tracker/core";
 import { transactionsApi, type Transaction } from "@/api/transactions";
 
@@ -9,16 +11,26 @@ export type { Transaction };
 
 export const transactionsQueryKey = (
   sort?: TransactionSort,
-  filter?: TransactionFilter
-) => ["transactions", sort, filter] as const;
+  filter?: TransactionFilter,
+  pagination?: TransactionPagination
+) => ["transactions", sort, filter, pagination] as const;
 
 export function useTransactions(
   sort?: TransactionSort,
-  filter?: TransactionFilter
+  filter?: TransactionFilter,
+  pagination?: TransactionPagination
 ) {
   return useQuery({
-    queryKey: transactionsQueryKey(sort, filter),
-    queryFn: ({ signal }) => transactionsApi.fetchAll(sort, filter, signal),
+    queryKey: transactionsQueryKey(sort, filter, pagination),
+    queryFn: ({ signal }) =>
+      transactionsApi.fetchAll(sort, filter, pagination, signal),
+  });
+}
+
+export function useTransactionSummary(query: TransactionSummaryQuery) {
+  return useQuery({
+    queryKey: ["transactions", "summary", query],
+    queryFn: ({ signal }) => transactionsApi.fetchSummary(query, signal),
   });
 }
 

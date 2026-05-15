@@ -1,4 +1,15 @@
-import { OperationType, Category, TransactionStatus, Currency, type TransactionSort, type TransactionFilter } from "@expense-tracker/core";
+import {
+  OperationType,
+  Category,
+  TransactionStatus,
+  Currency,
+  type TransactionSort,
+  type TransactionFilter,
+  type TransactionPagination,
+  type PaginatedResult,
+  type TransactionSummaryQuery,
+  type TransactionSummary,
+} from "@expense-tracker/core";
 import { Http } from "./http";
 
 export interface Transaction {
@@ -20,11 +31,27 @@ export interface Transaction {
 class TransactionsApi extends Http {
   private readonly path = "/api/transactions";
 
-  async fetchAll(sort?: TransactionSort, filter?: TransactionFilter, signal?: AbortSignal): Promise<Transaction[]> {
-    const { data } = await this.http.get<Transaction[]>(this.path, {
-      params: { ...sort, ...filter },
-      signal,
-    });
+  async fetchAll(
+    sort?: TransactionSort,
+    filter?: TransactionFilter,
+    pagination?: TransactionPagination,
+    signal?: AbortSignal
+  ): Promise<PaginatedResult<Transaction>> {
+    const { data } = await this.http.get<PaginatedResult<Transaction>>(
+      this.path,
+      { params: { ...sort, ...filter, ...pagination }, signal }
+    );
+    return data;
+  }
+
+  async fetchSummary(
+    query: TransactionSummaryQuery,
+    signal?: AbortSignal
+  ): Promise<TransactionSummary> {
+    const { data } = await this.http.get<TransactionSummary>(
+      `${this.path}/summary`,
+      { params: query, signal }
+    );
     return data;
   }
 

@@ -7,7 +7,12 @@ import {
   TransactionStatus,
   Currency,
 } from "@expense-tracker/core";
+import type { PaginatedResult } from "@expense-tracker/core";
 import type { Transaction } from "@/api/transactions";
+
+function makePage(data: Transaction[]): PaginatedResult<Transaction> {
+  return { data, total: data.length, page: 1, pageSize: 10, totalPages: 1 };
+}
 import TransactionsTable from "../TransactionsTable";
 import { TransactionsFilterProvider } from "../../../context/TransactionsFilterContext";
 
@@ -76,20 +81,30 @@ beforeEach(() => {
 });
 
 function setupTransactions(data: Transaction[] = []) {
-  mockUseTransactions.mockReturnValue({ data } as ReturnType<typeof useTransactions>);
+  mockUseTransactions.mockReturnValue({
+    data: makePage(data),
+  } as ReturnType<typeof useTransactions>);
+}
+
+function renderTransactionsTable() {
+  return render(
+    <TransactionsFilterProvider>
+      <TransactionsTable />
+    </TransactionsFilterProvider>
+  );
 }
 
 describe("TransactionsTable", () => {
   describe("empty state", () => {
     it("shows empty state message when no transactions", () => {
       setupTransactions([]);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
+      renderTransactionsTable();
       expect(screen.getByText(/NO RECORDS FOUND/i)).toBeInTheDocument();
     });
 
     it("hides the table when no transactions", () => {
       setupTransactions([]);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
+      renderTransactionsTable();
       expect(screen.queryByRole("table")).not.toBeInTheDocument();
     });
   });
@@ -97,7 +112,7 @@ describe("TransactionsTable", () => {
   describe("rendering", () => {
     it("renders a row for each transaction", () => {
       setupTransactions(ALL);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
+      renderTransactionsTable();
       expect(screen.getByText("Monthly Salary")).toBeInTheDocument();
       expect(screen.getByText("Groceries")).toBeInTheDocument();
       expect(screen.getByText("Electric Bill")).toBeInTheDocument();
@@ -105,7 +120,7 @@ describe("TransactionsTable", () => {
 
     it("renders all table column headers", () => {
       setupTransactions(ALL);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
+      renderTransactionsTable();
       for (const heading of [
         "ID",
         "T·STAMP",
@@ -120,53 +135,59 @@ describe("TransactionsTable", () => {
 
     it("derives short ID from the last 4 chars of the id", () => {
       setupTransactions([salary]);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
+      renderTransactionsTable();
       expect(screen.getByText("TX-1111")).toBeInTheDocument();
     });
 
     it("formats date to YYYY-MM-DD", () => {
       setupTransactions([salary]);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
+      renderTransactionsTable();
       expect(screen.getByText("2025-05-01")).toBeInTheDocument();
     });
 
     it("renders category badge for each row", () => {
       setupTransactions(ALL);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
-      expect(screen.getAllByText(Category.Salary).length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText(Category.Food).length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText(Category.Utilities).length).toBeGreaterThanOrEqual(1);
+      renderTransactionsTable();
+      expect(
+        screen.getAllByText(Category.Salary).length
+      ).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(Category.Food).length).toBeGreaterThanOrEqual(
+        1
+      );
+      expect(
+        screen.getAllByText(Category.Utilities).length
+      ).toBeGreaterThanOrEqual(1);
     });
 
-    it("shows CONFIRMED status for confirmed transactions", () => {
-      setupTransactions([salary]);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
-      expect(screen.getByText("CONFIRMED")).toBeInTheDocument();
-    });
+    it.each([
+      { transaction: salary, expectedStatus: "CONFIRMED" },
+      { transaction: pendingExpense, expectedStatus: "PENDING" },
+    ])(
+      "shows $expectedStatus status for $transaction.description",
+      ({ transaction, expectedStatus }) => {
+        setupTransactions([transaction]);
+        renderTransactionsTable();
+        expect(screen.getByText(expectedStatus)).toBeInTheDocument();
+      }
+    );
 
-    it("shows PENDING status for pending transactions", () => {
-      setupTransactions([pendingExpense]);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
-      expect(screen.getByText("PENDING")).toBeInTheDocument();
-    });
-
-    it("formats inflow amount with + prefix and currency", () => {
-      setupTransactions([salary]);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
-      expect(screen.getByText(/\+5,000\.00 RON/)).toBeInTheDocument();
-    });
-
-    it("formats outflow amount with − prefix and currency", () => {
-      setupTransactions([groceries]);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
-      expect(screen.getByText(/−150\.50 RON/)).toBeInTheDocument();
-    });
+    it.each([
+      { transaction: salary, pattern: /\+5,000\.00 RON/ },
+      { transaction: groceries, pattern: /−150\.50 RON/ },
+    ])(
+      "formats amount correctly for $transaction.description",
+      ({ transaction, pattern }) => {
+        setupTransactions([transaction]);
+        renderTransactionsTable();
+        expect(screen.getByText(pattern)).toBeInTheDocument();
+      }
+    );
   });
 
   describe("delete button", () => {
     it("shows delete button only for pending transactions", () => {
       setupTransactions(ALL);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
+      renderTransactionsTable();
       const deleteButtons = screen.getAllByRole("button", { name: /delete/i });
       expect(deleteButtons).toHaveLength(1);
       expect(deleteButtons[0]).toHaveAttribute(
@@ -177,7 +198,7 @@ describe("TransactionsTable", () => {
 
     it("does not show delete button for confirmed transactions", () => {
       setupTransactions([salary]);
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
+      renderTransactionsTable();
       expect(
         screen.queryByRole("button", { name: /delete/i })
       ).not.toBeInTheDocument();
@@ -188,7 +209,7 @@ describe("TransactionsTable", () => {
       const user = userEvent.setup();
       vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
 
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
+      renderTransactionsTable();
 
       await user.click(screen.getByRole("button", { name: /delete/i }));
 
@@ -205,13 +226,41 @@ describe("TransactionsTable", () => {
       const user = userEvent.setup();
       vi.stubGlobal("confirm", vi.fn().mockReturnValue(false));
 
-      render(<TransactionsFilterProvider><TransactionsTable /></TransactionsFilterProvider>);
+      renderTransactionsTable();
 
       await user.click(screen.getByRole("button", { name: /delete/i }));
 
       expect(mockDeleteTransaction).not.toHaveBeenCalled();
 
       vi.unstubAllGlobals();
+    });
+  });
+
+  describe("pagination controls", () => {
+    it("shows record count", () => {
+      setupTransactions(ALL);
+      renderTransactionsTable();
+      expect(screen.getByText(/3 records/i)).toBeInTheDocument();
+    });
+
+    it("shows page indicator", () => {
+      setupTransactions(ALL);
+      renderTransactionsTable();
+      expect(screen.getByText("1 / 1")).toBeInTheDocument();
+    });
+
+    it("disables prev button on first page", () => {
+      setupTransactions(ALL);
+      renderTransactionsTable();
+      expect(
+        screen.getByRole("button", { name: /previous page/i })
+      ).toBeDisabled();
+    });
+
+    it("disables next button when on last page", () => {
+      setupTransactions(ALL);
+      renderTransactionsTable();
+      expect(screen.getByRole("button", { name: /next page/i })).toBeDisabled();
     });
   });
 });

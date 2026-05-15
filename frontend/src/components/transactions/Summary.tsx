@@ -1,15 +1,12 @@
-import { OperationType } from "@expense-tracker/core";
 import { useCountUp } from "../../hooks/useCountUp";
-import { useTransactions } from "../../hooks/useTransactions";
+import { useTransactionSummary } from "../../hooks/useTransactions";
+import { useSummaryPeriod } from "../../context/SummaryPeriodContext";
 
 function Summary() {
-  const { data: transactions = [] } = useTransactions();
-  const totalIncome = transactions
-    .filter((t) => t.operationType === OperationType.Inflow)
-    .reduce((sum, t) => sum + Number(t.amount), 0);
-  const totalExpenses = transactions
-    .filter((t) => t.operationType === OperationType.Outflow)
-    .reduce((sum, t) => sum + Number(t.amount), 0);
+  const { query } = useSummaryPeriod();
+  const { data } = useTransactionSummary(query);
+  const totalIncome = data?.totalInflow ?? 0;
+  const totalExpenses = data?.totalOutflow ?? 0;
   const balance = totalIncome - totalExpenses;
   const isNegative = balance < 0;
 

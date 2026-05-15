@@ -6,12 +6,14 @@ import SectionHead from "../components/ui/SectionHead";
 import SignOutButton from "../components/auth/SignOutButton";
 import Summary from "../components/transactions/Summary";
 import SpendingByCategory from "../components/transactions/SpendingByCategory";
+import SummaryPeriodSelector from "../components/transactions/SummaryPeriodSelector";
 import TransactionForm from "../components/transactions/TransactionForm";
 import TransactionFilters from "../components/transactions/TransactionFilters";
 import TransactionsTable from "../components/transactions/TransactionsTable";
 import HealthStatus from "../components/ui/HealthStatus";
 import { NewTransaction, CATEGORIES } from "../types";
 import { TransactionsFilterProvider } from "../context/TransactionsFilterContext";
+import { SummaryPeriodProvider } from "../context/SummaryPeriodContext";
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -36,21 +38,24 @@ export default function HomePage() {
         }
       />
 
-      <Summary />
+      <SummaryPeriodProvider>
+        <SummaryPeriodSelector />
+        <Summary />
 
-      <section className="mb-17 opacity-0 animate-fade-up [animation-delay:0.5s]">
-        <SectionHead
-          eyebrow="02 / 04"
-          title="Expenditure Distribution"
-          status={
-            <>
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-green shadow-[0_0_8px_rgba(77,255,170,0.4)]" />{" "}
-              LIVE
-            </>
-          }
-        />
-        <SpendingByCategory />
-      </section>
+        <section className="mb-17 opacity-0 animate-fade-up [animation-delay:0.5s]">
+          <SectionHead
+            eyebrow="02 / 04"
+            title="Expenditure Distribution"
+            status={
+              <>
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-green shadow-[0_0_8px_rgba(77,255,170,0.4)]" />{" "}
+                LIVE
+              </>
+            }
+          />
+          <SpendingByCategory />
+        </section>
+      </SummaryPeriodProvider>
 
       <section className="mb-17 opacity-0 animate-fade-up [animation-delay:0.65s]">
         <SectionHead

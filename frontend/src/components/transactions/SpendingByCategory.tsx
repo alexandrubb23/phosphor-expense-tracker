@@ -8,9 +8,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { OperationType } from "@expense-tracker/core";
 import { CATEGORY_COLORS, CATEGORY_COLOR_FALLBACK } from "../../categoryColors";
-import { useTransactions } from "../../hooks/useTransactions";
+import { useTransactionSummary } from "../../hooks/useTransactions";
+import { useSummaryPeriod } from "../../context/SummaryPeriodContext";
 
 interface ChartEntry {
   name: string;
@@ -45,17 +45,12 @@ function CustomTooltip({
 }
 
 function SpendingByCategory() {
-  const { data: transactions = [] } = useTransactions();
-  const totalsByCategory = transactions
-    .filter((t) => t.operationType === OperationType.Outflow)
-    .reduce<Record<string, number>>((acc, t) => {
-      acc[t.category] = (acc[t.category] ?? 0) + Number(t.amount);
-      return acc;
-    }, {});
-
-  const data: ChartEntry[] = Object.entries(totalsByCategory)
-    .map(([name, value]) => ({ name, value }))
-    .sort((a, b) => b.value - a.value);
+  const { query } = useSummaryPeriod();
+  const { data: summary } = useTransactionSummary(query);
+  const data: ChartEntry[] = (summary?.byCategory ?? []).map((c) => ({
+    name: c.category,
+    value: c.total,
+  }));
 
   return (
     <div className="relative border border-hairline bg-panel px-6 pt-6 pb-2">
