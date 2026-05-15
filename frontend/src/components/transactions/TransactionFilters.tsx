@@ -7,11 +7,12 @@ import {
 } from "@expense-tracker/core";
 import { useTransactionsFilter } from "../../context/TransactionsFilterContext";
 import FilterSelect, { type FilterSelectKey } from "./FilterSelect";
+import ResetButton from "../ui/ResetButton";
 
 const SEARCH_DEBOUNCE_MS = 350;
 
 export default function TransactionFilters() {
-  const { filter, setFilter } = useTransactionsFilter();
+  const { filter, setFilter, resetFilter } = useTransactionsFilter();
 
   const [searchInput, setSearchInput] = useState(filter.search ?? "");
   const [debouncedSearch] = useDebounceValue(searchInput, SEARCH_DEBOUNCE_MS);
@@ -37,6 +38,17 @@ export default function TransactionFilters() {
     },
     [setFilter]
   );
+
+  const handleReset = useCallback(() => {
+    setSearchInput("");
+    resetFilter();
+  }, [resetFilter]);
+
+  const isFiltered =
+    searchInput !== "" ||
+    !!filter.operationType ||
+    !!filter.category ||
+    !!filter.status;
 
   return (
     <div className="mb-6 flex flex-wrap items-center gap-4 border border-hairline bg-surface px-4.5 py-3.5 font-mono">
@@ -105,6 +117,9 @@ export default function TransactionFilters() {
           Pending
         </option>
       </FilterSelect>
+      {isFiltered && (
+        <ResetButton onClick={handleReset} aria-label="Reset all filters" />
+      )}
     </div>
   );
 }

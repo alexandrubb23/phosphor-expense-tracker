@@ -21,6 +21,7 @@ interface SummaryPeriodContextValue {
   setPeriod: (period: SummaryPeriod) => void;
   setFrom: (from: string | undefined) => void;
   setTo: (to: string | undefined) => void;
+  resetPeriod: () => void;
 }
 
 const SummaryPeriodContext = createContext<
@@ -37,9 +38,24 @@ export function SummaryPeriodProvider({ children }: { children: ReactNode }) {
     [period, from, to]
   );
 
+  const resetPeriod = () => {
+    setPeriod(SummaryPeriod.month);
+    setFrom(undefined);
+    setTo(undefined);
+  };
+
   return (
     <SummaryPeriodContext.Provider
-      value={{ period, from, to, query, setPeriod, setFrom, setTo }}
+      value={{
+        period,
+        from,
+        to,
+        query,
+        setPeriod,
+        setFrom,
+        setTo,
+        resetPeriod,
+      }}
     >
       {children}
     </SummaryPeriodContext.Provider>

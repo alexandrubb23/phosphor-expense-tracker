@@ -3,6 +3,9 @@ import {
   SUMMARY_PERIODS,
   useSummaryPeriod,
 } from "../../context/SummaryPeriodContext";
+import ResetButton from "../ui/ResetButton";
+
+const DEFAULT_PERIOD = SummaryPeriod.month;
 
 const PERIOD_LABELS: Record<SummaryPeriod, string> = {
   [SummaryPeriod.today]: "TODAY",
@@ -13,7 +16,10 @@ const PERIOD_LABELS: Record<SummaryPeriod, string> = {
 };
 
 export default function SummaryPeriodSelector() {
-  const { period, from, to, setPeriod, setFrom, setTo } = useSummaryPeriod();
+  const { period, from, to, setPeriod, setFrom, setTo, resetPeriod } =
+    useSummaryPeriod();
+
+  const isNonDefault = period !== DEFAULT_PERIOD || !!from || !!to;
 
   return (
     <div className="mb-6 flex flex-wrap items-center gap-3 border border-hairline bg-surface px-4.5 py-3 font-mono">
@@ -58,6 +64,10 @@ export default function SummaryPeriodSelector() {
             aria-label="To date"
           />
         </div>
+      )}
+
+      {isNonDefault && (
+        <ResetButton onClick={resetPeriod} aria-label="Reset period" />
       )}
     </div>
   );

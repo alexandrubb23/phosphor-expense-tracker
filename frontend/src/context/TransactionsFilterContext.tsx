@@ -11,6 +11,7 @@ import { type TransactionFilter } from "@expense-tracker/core";
 interface TransactionsFilterContextValue {
   filter: TransactionFilter;
   setFilter: Dispatch<SetStateAction<TransactionFilter>>;
+  resetFilter: () => void;
 }
 
 const TransactionsFilterContext = createContext<
@@ -25,8 +26,11 @@ export function TransactionsFilterProvider({
   initialFilter?: TransactionFilter;
 }) {
   const [filter, setFilter] = useState<TransactionFilter>(initialFilter);
+  const resetFilter = () => setFilter({});
   return (
-    <TransactionsFilterContext.Provider value={{ filter, setFilter }}>
+    <TransactionsFilterContext.Provider
+      value={{ filter, setFilter, resetFilter }}
+    >
       {children}
     </TransactionsFilterContext.Provider>
   );
