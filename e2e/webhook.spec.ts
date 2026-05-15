@@ -25,6 +25,21 @@ async function signInAsAdmin(ctx: APIRequestContext) {
   expect(res.ok(), "Admin sign-in failed").toBeTruthy();
 }
 
+/**
+ * Creates a whitelist entry for the given email and returns its ID.
+ * Callers should pass a per-invocation unique email to avoid parallel-worker
+ * conflicts (see beforeAll usage below).
+ */
+async function addToWhitelist(
+  ctx: APIRequestContext,
+  senderEmail: string
+): Promise<string> {
+  const res = await ctx.post("/api/whitelist", { data: { senderEmail } });
+  expect(res.ok(), `Whitelist setup failed with status ${res.status()}`).toBeTruthy();
+  const entry = await res.json();
+  return entry.id;
+}
+
 // ── Secret validation ─────────────────────────────────────────────────────────
 
 test.describe("Webhook — secret validation", () => {
@@ -70,7 +85,8 @@ test.describe("Webhook — secret validation", () => {
 // ── Sender whitelist ──────────────────────────────────────────────────────────
 
 test.describe("Webhook — sender whitelist", () => {
-  const WHITELISTED = "webhook-sender@example.com";
+  // Unique per-worker email avoids conflicts when parallel workers each run beforeAll.
+  let WHITELISTED: string;
   const SECRET = process.env.WEBHOOK_SECRET!;
   let ctx: APIRequestContext;
   let whitelistId: string;
@@ -78,13 +94,8 @@ test.describe("Webhook — sender whitelist", () => {
   test.beforeAll(async ({ playwright }) => {
     ctx = await playwright.request.newContext({ baseURL: BACKEND });
     await signInAsAdmin(ctx);
-
-    const res = await ctx.post("/api/whitelist", {
-      data: { senderEmail: WHITELISTED },
-    });
-    expect(res.ok(), "Whitelist setup failed").toBeTruthy();
-    const entry = await res.json();
-    whitelistId = entry.id;
+    WHITELISTED = `webhook-sender-${Math.random().toString(36).slice(2)}@example.com`;
+    whitelistId = await addToWhitelist(ctx, WHITELISTED);
   });
 
   test.afterAll(async () => {
@@ -118,7 +129,8 @@ test.describe("Webhook — sender whitelist", () => {
 // ── Transaction creation ──────────────────────────────────────────────────────
 
 test.describe("Webhook — transaction creation", () => {
-  const SENDER = "tx-webhook@example.com";
+  // Unique per-worker email avoids conflicts when parallel workers each run beforeAll.
+  let SENDER: string;
   const SECRET = process.env.WEBHOOK_SECRET!;
   let ctx: APIRequestContext;
   let whitelistId: string;
@@ -126,13 +138,8 @@ test.describe("Webhook — transaction creation", () => {
   test.beforeAll(async ({ playwright }) => {
     ctx = await playwright.request.newContext({ baseURL: BACKEND });
     await signInAsAdmin(ctx);
-
-    const res = await ctx.post("/api/whitelist", {
-      data: { senderEmail: SENDER },
-    });
-    expect(res.ok(), "Whitelist setup failed").toBeTruthy();
-    const entry = await res.json();
-    whitelistId = entry.id;
+    SENDER = `tx-webhook-${Math.random().toString(36).slice(2)}@example.com`;
+    whitelistId = await addToWhitelist(ctx, SENDER);
   });
 
   test.afterAll(async () => {
@@ -155,7 +162,7 @@ test.describe("Webhook — transaction creation", () => {
     // Verify the transaction appears in the pending list
     const listRes = await ctx.get("/api/transactions");
     expect(listRes.ok()).toBeTruthy();
-    const transactions: Array<{ id: string; rawEmailBody: string; status: string }> =
+    const { data: transactions }: { data: Array<{ id: string; rawEmailBody: string; status: string }> } =
       await listRes.json();
 
     const created = transactions.find((tx) => tx.rawEmailBody === body);
@@ -174,7 +181,7 @@ test.describe("Webhook — transaction creation", () => {
     });
 
     const listRes = await ctx.get("/api/transactions");
-    const transactions: Array<{ id: string; rawEmailBody: string }> =
+    const { data: transactions }: { data: Array<{ id: string; rawEmailBody: string }> } =
       await listRes.json();
 
     const created = transactions.find((tx) => tx.rawEmailBody === body);
@@ -193,7 +200,7 @@ test.describe("Webhook — transaction creation", () => {
     // With DISABLE_AI=true the stub returns a fixed description,
     // but rawEmailBody should be the subject (effectiveBody = subject when text is empty)
     const listRes = await ctx.get("/api/transactions");
-    const transactions: Array<{ id: string; rawEmailBody: string }> =
+    const { data: transactions }: { data: Array<{ id: string; rawEmailBody: string }> } =
       await listRes.json();
 
     const created = transactions.find((tx) => tx.rawEmailBody === subject);
