@@ -20,6 +20,7 @@ import {
   useDeleteTransaction,
 } from "../../hooks/useTransactions";
 import { useTransactionsFilter } from "../../context/TransactionsFilterContext";
+import ConfirmDeleteModal from "../ui/ConfirmDeleteModal";
 
 function SortIcon({ isSorted }: { isSorted: false | SortDir }) {
   if (isSorted === SortDir.asc)
@@ -80,16 +81,13 @@ function TransactionsTable() {
   const totalPages = result?.totalPages ?? 1;
   const total = result?.total ?? 0;
 
-  const { mutate: deleteTransaction } = useDeleteTransaction();
+  const { mutateAsync: deleteTransaction } = useDeleteTransaction();
 
-  const handleDelete = useCallback(
-    (transaction: { id: string; description: string }) => {
-      if (window.confirm(`Delete "${transaction.description}"?`)) {
-        deleteTransaction(transaction.id);
-      }
-    },
-    [deleteTransaction]
-  );
+  const [pendingDelete, setPendingDelete] = useState<Transaction | null>(null);
+
+  const handleDelete = useCallback((transaction: Transaction) => {
+    setPendingDelete(transaction);
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -164,8 +162,7 @@ function TransactionsTable() {
         enableSorting: false,
         cell: (info) => {
           const t = info.row.original;
-          const isPending = t.status === TransactionStatus.Pending;
-          return isPending ? (
+          return (
             <button
               className="inline-flex h-6.5 w-6.5 items-center justify-center border border-hairline-glow bg-transparent font-mono text-sm leading-none text-muted transition-all duration-200 hover:border-red hover:bg-red hover:text-bg-deep hover:shadow-[0_0_16px_rgba(255,58,92,0.5)]"
               onClick={() => handleDelete(t)}
@@ -174,7 +171,7 @@ function TransactionsTable() {
             >
               ×
             </button>
-          ) : null;
+          );
         },
       }),
     ],
@@ -345,6 +342,16 @@ function TransactionsTable() {
             </div>
           </div>
         </>
+      )}
+
+      {pendingDelete && (
+        <ConfirmDeleteModal
+          title="Delete Transaction"
+          entityName={pendingDelete.description}
+          onConfirm={() => deleteTransaction(pendingDelete.id)}
+          onClose={() => setPendingDelete(null)}
+          fallbackError="Failed to delete transaction"
+        />
       )}
     </div>
   );

@@ -46,12 +46,18 @@ function getDateRange(period: SummaryPeriodType, from?: string, to?: string) {
   return { gte: start };
 }
 
-async function requirePendingTransaction(id: string, userId: string) {
+async function requireOwnedTransaction(id: string, userId: string) {
   const tx = await prisma.transaction.findUnique({ where: { id } });
 
   if (!tx || tx.userId !== userId || tx.deletedAt !== null) {
-    throw new HttpNotFoundError("Pending transaction not found");
+    throw new HttpNotFoundError("Transaction not found");
   }
+
+  return tx;
+}
+
+async function requirePendingTransaction(id: string, userId: string) {
+  const tx = await requireOwnedTransaction(id, userId);
 
   if (tx.status !== TransactionStatus.Pending) {
     throw new HttpBadRequestError("Transaction is not pending");
@@ -156,7 +162,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  await requirePendingTransaction(req.params.id, req.user!.id);
+  await requireOwnedTransaction(req.params.id, req.user!.id);
 
   await prisma.transaction.update({
     where: { id: req.params.id },

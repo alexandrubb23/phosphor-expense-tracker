@@ -16,11 +16,11 @@ function makePage(data: Transaction[]): PaginatedResult<Transaction> {
 import TransactionsTable from "../TransactionsTable";
 import { TransactionsFilterProvider } from "../../../context/TransactionsFilterContext";
 
-const mockDeleteTransaction = vi.fn();
+const mockDeleteTransaction = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@/hooks/useTransactions", () => ({
   useTransactions: vi.fn(),
-  useDeleteTransaction: vi.fn(() => ({ mutate: mockDeleteTransaction })),
+  useDeleteTransaction: vi.fn(() => ({ mutateAsync: mockDeleteTransaction })),
 }));
 
 import { useTransactions } from "@/hooks/useTransactions";
@@ -185,54 +185,68 @@ describe("TransactionsTable", () => {
   });
 
   describe("delete button", () => {
-    it("shows delete button only for pending transactions", () => {
+    it("shows a delete button for every transaction", () => {
       setupTransactions(ALL);
       renderTransactionsTable();
       const deleteButtons = screen.getAllByRole("button", { name: /delete/i });
-      expect(deleteButtons).toHaveLength(1);
-      expect(deleteButtons[0]).toHaveAttribute(
-        "aria-label",
-        `Delete ${pendingExpense.description}`
-      );
+      expect(deleteButtons).toHaveLength(ALL.length);
     });
 
-    it("does not show delete button for confirmed transactions", () => {
+    it("shows delete button for confirmed transactions", () => {
       setupTransactions([salary]);
       renderTransactionsTable();
       expect(
-        screen.queryByRole("button", { name: /delete/i })
-      ).not.toBeInTheDocument();
+        screen.getByRole("button", { name: `Delete ${salary.description}` })
+      ).toBeInTheDocument();
+    });
+
+    it("opens confirm modal when delete button is clicked", async () => {
+      setupTransactions([pendingExpense]);
+      const user = userEvent.setup();
+      renderTransactionsTable();
+
+      await user.click(
+        screen.getByRole("button", {
+          name: `Delete ${pendingExpense.description}`,
+        })
+      );
+
+      expect(
+        screen.getByText(/are you sure you want to delete/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /▸ delete/i })
+      ).toBeInTheDocument();
     });
 
     it("calls deleteTransaction with the transaction id after confirmation", async () => {
       setupTransactions([pendingExpense]);
       const user = userEvent.setup();
-      vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
-
       renderTransactionsTable();
 
-      await user.click(screen.getByRole("button", { name: /delete/i }));
-
-      expect(window.confirm).toHaveBeenCalledWith(
-        `Delete "${pendingExpense.description}"?`
+      await user.click(
+        screen.getByRole("button", {
+          name: `Delete ${pendingExpense.description}`,
+        })
       );
-      expect(mockDeleteTransaction).toHaveBeenCalledWith(pendingExpense.id);
+      await user.click(screen.getByRole("button", { name: /▸ delete/i }));
 
-      vi.unstubAllGlobals();
+      expect(mockDeleteTransaction).toHaveBeenCalledWith(pendingExpense.id);
     });
 
     it("does not call deleteTransaction when user cancels", async () => {
       setupTransactions([pendingExpense]);
       const user = userEvent.setup();
-      vi.stubGlobal("confirm", vi.fn().mockReturnValue(false));
-
       renderTransactionsTable();
 
-      await user.click(screen.getByRole("button", { name: /delete/i }));
+      await user.click(
+        screen.getByRole("button", {
+          name: `Delete ${pendingExpense.description}`,
+        })
+      );
+      await user.click(screen.getByRole("button", { name: /cancel/i }));
 
       expect(mockDeleteTransaction).not.toHaveBeenCalled();
-
-      vi.unstubAllGlobals();
     });
   });
 
