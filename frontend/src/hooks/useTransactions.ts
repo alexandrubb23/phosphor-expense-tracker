@@ -4,6 +4,7 @@ import {
   type TransactionFilter,
   type TransactionPagination,
   type TransactionSummaryQuery,
+  type CreateTransaction,
 } from "@expense-tracker/core";
 import { transactionsApi, type Transaction } from "@/api/transactions";
 
@@ -31,6 +32,16 @@ export function useTransactionSummary(query: TransactionSummaryQuery) {
   return useQuery({
     queryKey: ["transactions", "summary", query],
     queryFn: ({ signal }) => transactionsApi.fetchSummary(query, signal),
+  });
+}
+
+export function useCreateTransaction() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateTransaction) => transactionsApi.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    },
   });
 }
 

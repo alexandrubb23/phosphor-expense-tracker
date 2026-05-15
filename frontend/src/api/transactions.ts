@@ -9,6 +9,7 @@ import {
   type PaginatedResult,
   type TransactionSummaryQuery,
   type TransactionSummary,
+  type CreateTransaction,
 } from "@expense-tracker/core";
 import { Http } from "./http";
 
@@ -53,6 +54,14 @@ class TransactionsApi extends Http {
       { params: query, signal }
     );
     return data;
+  }
+
+  async create(data: CreateTransaction): Promise<Transaction> {
+    const { data: transaction } = await this.http.post<Transaction>(
+      this.path,
+      data
+    );
+    return transaction;
   }
 
   async remove(id: string): Promise<void> {

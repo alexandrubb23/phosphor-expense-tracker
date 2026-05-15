@@ -11,16 +11,11 @@ import TransactionForm from "../components/transactions/TransactionForm";
 import TransactionFilters from "../components/transactions/TransactionFilters";
 import TransactionsTable from "../components/transactions/TransactionsTable";
 import HealthStatus from "../components/ui/HealthStatus";
-import { NewTransaction, CATEGORIES } from "../types";
 import { TransactionsFilterProvider } from "../context/TransactionsFilterContext";
 import { SummaryPeriodProvider } from "../context/SummaryPeriodContext";
 
 export default function HomePage() {
   const { data: session } = useSession();
-
-  const addTransaction = (_transaction: NewTransaction) => {
-    // TODO: wire up POST /api/transactions when manual entry is implemented
-  };
 
   const operatorName = session?.user?.name?.toUpperCase() ?? "OPERATOR";
   const isAdmin = useIsAdmin();
@@ -63,7 +58,7 @@ export default function HomePage() {
           title="Manual Log Entry"
           status="INPUT READY"
         />
-        <TransactionForm categories={[...CATEGORIES]} onAdd={addTransaction} />
+        <TransactionForm />
       </section>
 
       <section className="mb-17 opacity-0 animate-fade-up [animation-delay:0.8s]">

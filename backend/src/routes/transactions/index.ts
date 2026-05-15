@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getPrisma } from "../../lib/prisma.js";
 import { validate } from "../../lib/validate.js";
 import {
+  CreateTransactionSchema,
   UpdatePendingTransactionSchema,
   TransactionSortSchema,
   TransactionFilterSchema,
@@ -106,6 +107,20 @@ router.get("/summary", async (req, res) => {
       })
     ),
   });
+});
+
+router.post("/", async (req, res) => {
+  const data = validate(CreateTransactionSchema, req.body);
+
+  const transaction = await prisma.transaction.create({
+    data: {
+      ...data,
+      date: new Date(data.date),
+      userId: req.user!.id,
+    },
+  });
+
+  res.status(201).json(transaction);
 });
 
 router.get("/", async (req, res) => {

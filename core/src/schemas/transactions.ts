@@ -2,8 +2,25 @@ import { z } from "zod";
 import { OperationType } from "../constants/operation-type.js";
 import { Category } from "../constants/category.js";
 import { TransactionStatus } from "../constants/transaction-status.js";
+import { Currency } from "../constants/currency.js";
 import { SortDir } from "../enums/sort-dir.js";
 import { SummaryPeriod } from "../enums/summary-period.js";
+
+export const CreateTransactionSchema = z.object({
+  description: z.string().trim().min(1).max(200),
+  amount: z.number().positive(),
+  operationType: z.enum(OperationType),
+  category: z.enum(Category),
+  subcategory: z.string().trim().nullable().optional(),
+  date: z.date(),
+  currency: z.enum(Currency).optional().default(Currency.RON),
+  status: z
+    .enum(TransactionStatus)
+    .optional()
+    .default(TransactionStatus.Confirmed),
+});
+
+export type CreateTransaction = z.infer<typeof CreateTransactionSchema>;
 
 const transactionFields = {
   description: z.string().trim().min(1).optional(),
