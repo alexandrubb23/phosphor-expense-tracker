@@ -31,10 +31,9 @@ router.get("/", async (req, res) => {
   const transactions = await prisma.transaction.findMany({
     where: {
       userId: req.user!.id,
-      status: TransactionStatus.Pending,
       deletedAt: null,
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ date: "desc" }, { createdAt: "desc" }],
   });
 
   res.json(transactions);

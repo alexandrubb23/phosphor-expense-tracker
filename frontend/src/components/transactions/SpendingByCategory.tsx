@@ -8,8 +8,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { OperationType } from "@expense-tracker/core";
 import { CATEGORY_COLORS, CATEGORY_COLOR_FALLBACK } from "../../categoryColors";
-import { Transaction } from "../../types";
+import { Transaction } from "../../api/transactions";
 
 interface SpendingByCategoryProps {
   transactions: Transaction[];
@@ -49,9 +50,9 @@ function CustomTooltip({
 
 function SpendingByCategory({ transactions }: SpendingByCategoryProps) {
   const totalsByCategory = transactions
-    .filter((t) => t.type === "expense")
+    .filter((t) => t.operationType === OperationType.Outflow)
     .reduce<Record<string, number>>((acc, t) => {
-      acc[t.category] = (acc[t.category] ?? 0) + t.amount;
+      acc[t.category] = (acc[t.category] ?? 0) + Number(t.amount);
       return acc;
     }, {});
 

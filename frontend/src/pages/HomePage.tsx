@@ -1,6 +1,9 @@
-import { useState } from "react";
 import { useSession } from "../lib/auth-client";
 import { useIsAdmin } from "../hooks/useIsAdmin";
+import {
+  useTransactions,
+  useDeleteTransaction,
+} from "../hooks/useTransactions";
 import Masthead from "../components/ui/Masthead";
 import NavButton from "../components/ui/NavButton";
 import SectionHead from "../components/ui/SectionHead";
@@ -10,88 +13,15 @@ import SpendingByCategory from "../components/transactions/SpendingByCategory";
 import TransactionForm from "../components/transactions/TransactionForm";
 import TransactionList from "../components/transactions/TransactionList";
 import HealthStatus from "../components/ui/HealthStatus";
-import { Transaction, NewTransaction, CATEGORIES } from "../types";
-
-let nextId = 9;
-
-const INITIAL_TRANSACTIONS: Transaction[] = [
-  {
-    id: 1,
-    description: "Salary",
-    amount: 5000,
-    type: "income",
-    category: "salary",
-    date: "2025-01-01",
-  },
-  {
-    id: 2,
-    description: "Rent",
-    amount: 1200,
-    type: "expense",
-    category: "housing",
-    date: "2025-01-02",
-  },
-  {
-    id: 3,
-    description: "Groceries",
-    amount: 150,
-    type: "expense",
-    category: "food",
-    date: "2025-01-03",
-  },
-  {
-    id: 4,
-    description: "Freelance Work",
-    amount: 800,
-    type: "income",
-    category: "salary",
-    date: "2025-01-05",
-  },
-  {
-    id: 5,
-    description: "Electric Bill",
-    amount: 95,
-    type: "expense",
-    category: "utilities",
-    date: "2025-01-06",
-  },
-  {
-    id: 6,
-    description: "Dinner Out",
-    amount: 65,
-    type: "expense",
-    category: "food",
-    date: "2025-01-07",
-  },
-  {
-    id: 7,
-    description: "Gas",
-    amount: 45,
-    type: "expense",
-    category: "transport",
-    date: "2025-01-08",
-  },
-  {
-    id: 8,
-    description: "Netflix",
-    amount: 15,
-    type: "expense",
-    category: "entertainment",
-    date: "2025-01-10",
-  },
-];
+import { NewTransaction, CATEGORIES } from "../types";
 
 export default function HomePage() {
   const { data: session } = useSession();
-  const [transactions, setTransactions] =
-    useState<Transaction[]>(INITIAL_TRANSACTIONS);
+  const { data: transactions = [], isLoading, isError } = useTransactions();
+  const { mutate: deleteTransaction } = useDeleteTransaction();
 
-  const addTransaction = (transaction: NewTransaction) => {
-    setTransactions((prev) => [...prev, { ...transaction, id: nextId++ }]);
-  };
-
-  const deleteTransaction = (id: number) => {
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
+  const addTransaction = (_transaction: NewTransaction) => {
+    // TODO: wire up POST /api/transactions when manual entry is implemented
   };
 
   const operatorName = session?.user?.name?.toUpperCase() ?? "OPERATOR";
@@ -109,6 +39,12 @@ export default function HomePage() {
           </div>
         }
       />
+
+      {isError && (
+        <p className="mb-6 border border-red bg-panel px-4 py-3 font-mono text-[12px] uppercase tracking-widest text-red">
+          ⚠ FAILED TO LOAD TRANSACTIONS
+        </p>
+      )}
 
       <Summary transactions={transactions} />
 
@@ -140,15 +76,18 @@ export default function HomePage() {
           eyebrow="04 / 04"
           title="Transaction Archive"
           status={
-            <>
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-green shadow-[0_0_8px_rgba(77,255,170,0.4)]" />
-              {transactions.length} REC
-            </>
+            isLoading ? (
+              "LOADING…"
+            ) : (
+              <>
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-green shadow-[0_0_8px_rgba(77,255,170,0.4)]" />
+                {transactions.length} REC
+              </>
+            )
           }
         />
         <TransactionList
           transactions={transactions}
-          categories={[...CATEGORIES]}
           onDelete={deleteTransaction}
         />
       </section>

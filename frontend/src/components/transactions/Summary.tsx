@@ -1,4 +1,5 @@
-import { Transaction } from "../../types";
+import { OperationType } from "@expense-tracker/core";
+import { Transaction } from "../../api/transactions";
 import { useCountUp } from "../../hooks/useCountUp";
 
 interface SummaryProps {
@@ -7,11 +8,11 @@ interface SummaryProps {
 
 function Summary({ transactions }: SummaryProps) {
   const totalIncome = transactions
-    .filter((t) => t.type === "income")
-    .reduce((sum, t) => sum + t.amount, 0);
+    .filter((t) => t.operationType === OperationType.Inflow)
+    .reduce((sum, t) => sum + Number(t.amount), 0);
   const totalExpenses = transactions
-    .filter((t) => t.type === "expense")
-    .reduce((sum, t) => sum + t.amount, 0);
+    .filter((t) => t.operationType === OperationType.Outflow)
+    .reduce((sum, t) => sum + Number(t.amount), 0);
   const balance = totalIncome - totalExpenses;
   const isNegative = balance < 0;
 
