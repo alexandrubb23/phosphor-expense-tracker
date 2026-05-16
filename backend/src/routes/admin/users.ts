@@ -1,7 +1,12 @@
 import { Router } from "express";
 import { randomUUID } from "crypto";
 import { hashPassword } from "better-auth/crypto";
-import { createUserSchema, editUserSchema, Role, SortDir } from "@expense-tracker/core";
+import {
+  createUserSchema,
+  editUserSchema,
+  Role,
+  SortDir,
+} from "@expense-tracker/core";
 import { getPrisma } from "../../lib/prisma.js";
 import { validate } from "../../lib/validate.js";
 import {
@@ -67,6 +72,10 @@ router.post("/", async (req, res) => {
       userId,
       password: hashedPassword,
     },
+  });
+
+  await prisma.senderWhitelist.create({
+    data: { userId, senderEmail: email },
   });
 
   res.status(201).json({ user });

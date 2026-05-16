@@ -85,6 +85,10 @@ async function seedAdminUser() {
     },
   });
 
+  await prisma.senderWhitelist.create({
+    data: { userId: id, senderEmail: email },
+  });
+
   console.log(`✅ Admin user created: ${email}`);
 }
 

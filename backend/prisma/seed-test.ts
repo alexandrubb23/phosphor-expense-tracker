@@ -78,6 +78,10 @@ async function main() {
       },
     });
 
+    await prisma.senderWhitelist.create({
+      data: { userId: id, senderEmail: email },
+    });
+
     console.log(`  ✅ Created ${role} user: ${email}`);
   }
 
