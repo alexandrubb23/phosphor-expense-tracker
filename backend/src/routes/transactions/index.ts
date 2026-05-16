@@ -134,7 +134,14 @@ router.get("/", async (req, res) => {
     ...(category ? { category } : {}),
     ...(status ? { status } : {}),
     ...(search
-      ? { description: { contains: search, mode: "insensitive" } }
+      ? {
+          AND: search
+            .trim()
+            .split(/\s+/)
+            .map((word) => ({
+              description: { contains: word, mode: "insensitive" as const },
+            })),
+        }
       : {}),
   };
 
@@ -142,7 +149,10 @@ router.get("/", async (req, res) => {
     prisma.transaction.count({ where }),
     prisma.transaction.findMany({
       where,
-      orderBy: [{ [sortBy]: sortDir }, { createdAt: sortDir }],
+      orderBy:
+        sortBy === "createdAt"
+          ? [{ createdAt: sortDir }]
+          : [{ [sortBy]: sortDir }, { createdAt: sortDir }],
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
