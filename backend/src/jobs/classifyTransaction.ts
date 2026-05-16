@@ -1,7 +1,13 @@
 import type PgBoss from "pg-boss";
 import { getPrisma } from "../lib/prisma.js";
 import { extractTransaction } from "../lib/extractTransaction.js";
-import { TransactionStatus, Confidence, Currency } from "@expense-tracker/core";
+import {
+  TransactionStatus,
+  Confidence,
+  Currency,
+  OperationType,
+  Category,
+} from "@expense-tracker/core";
 
 export const CLASSIFY_TRANSACTION_JOB = "classify-transaction";
 
@@ -19,10 +25,32 @@ export async function classifyTransactionWorker(
   for (const job of jobs) {
     const { userId, effectiveSubject, effectiveBody } = job.data;
 
-    const extraction = await extractTransaction(
-      effectiveSubject,
-      effectiveBody
-    );
+    let extraction;
+    try {
+      extraction = await extractTransaction(effectiveSubject, effectiveBody);
+    } catch (err) {
+      console.error(
+        `[classify-transaction] job ${job.id} — AI extraction failed, saving fallback transaction`,
+        err
+      );
+
+      await prisma.transaction.create({
+        data: {
+          userId,
+          description: "[AI extraction failed] — please review",
+          amount: 0,
+          operationType: OperationType.Outflow,
+          category: Category.Other,
+          subcategory: null,
+          currency: Currency.RON,
+          status: TransactionStatus.Pending,
+          date: new Date(),
+          rawEmailBody: effectiveBody,
+        },
+      });
+
+      continue;
+    }
 
     const status =
       extraction.confidence === Confidence.High
