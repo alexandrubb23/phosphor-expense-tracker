@@ -6,6 +6,7 @@ import SectionHead from "../components/ui/SectionHead";
 import SignOutButton from "../components/auth/SignOutButton";
 import Summary from "../components/transactions/Summary";
 import SpendingByCategory from "../components/transactions/SpendingByCategory";
+import MetricsBar from "../components/transactions/MetricsBar";
 import SummaryPeriodSelector from "../components/transactions/SummaryPeriodSelector";
 import TransactionForm from "../components/transactions/TransactionForm";
 import TransactionFilters from "../components/transactions/TransactionFilters";
@@ -48,6 +49,7 @@ export default function HomePage() {
               </>
             }
           />
+          <MetricsBar />
           <SpendingByCategory />
         </section>
       </SummaryPeriodProvider>

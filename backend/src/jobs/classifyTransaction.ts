@@ -1,6 +1,7 @@
 import type PgBoss from "pg-boss";
 import { getPrisma } from "../lib/prisma.js";
 import { extractTransaction } from "../lib/extractTransaction.js";
+import { AI_USER_ID } from "../lib/ai-user.js";
 import {
   TransactionStatus,
   Confidence,
@@ -46,20 +47,19 @@ export async function classifyTransactionWorker(
           status: TransactionStatus.Pending,
           date: new Date(),
           rawEmailBody: effectiveBody,
+          resolvedByUserId: null,
         },
       });
 
       continue;
     }
 
-    const status =
-      extraction.confidence === Confidence.High
-        ? TransactionStatus.Confirmed
-        : TransactionStatus.Pending;
-
+    const isAutoResolved = extraction.confidence === Confidence.High;
     const date = extraction.date ? new Date(extraction.date) : new Date();
 
-    await prisma.transaction.create({
+    // Always create as pending first so updatedAt advances when we confirm,
+    // giving a meaningful avgResolutionMs in the metrics.
+    const created = await prisma.transaction.create({
       data: {
         userId,
         description: extraction.description,
@@ -68,14 +68,25 @@ export async function classifyTransactionWorker(
         category: extraction.category,
         subcategory: extraction.subcategory ?? null,
         currency: Currency.RON,
-        status,
+        status: TransactionStatus.Pending,
         date,
         rawEmailBody: effectiveBody,
+        resolvedByUserId: null,
       },
     });
 
+    if (isAutoResolved) {
+      await prisma.transaction.update({
+        where: { id: created.id },
+        data: {
+          status: TransactionStatus.Confirmed,
+          resolvedByUserId: AI_USER_ID,
+        },
+      });
+    }
+
     console.log(
-      `[classify-transaction] job ${job.id} done — ${extraction.description} ${extraction.amount} RON`
+      `[classify-transaction] job ${job.id} done — ${extraction.description} ${extraction.amount} RON (auto-resolved: ${isAutoResolved})`
     );
   }
 }

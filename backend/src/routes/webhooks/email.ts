@@ -3,6 +3,13 @@ import multer from "multer";
 import { getQueue } from "../../lib/queue.js";
 import { CLASSIFY_TRANSACTION_JOB } from "../../jobs/classifyTransaction.js";
 import { getPrisma } from "../../lib/prisma.js";
+import { env } from "../../env.js";
+import {
+  TransactionStatus,
+  Currency,
+  OperationType,
+  Category,
+} from "@expense-tracker/core";
 
 const router = Router();
 const prisma = getPrisma();
@@ -40,10 +47,31 @@ router.post("/", upload.none(), async (req, res) => {
   }
 
   // Respond immediately so SendGrid doesn't time out or retry.
-  // Extraction + DB write happen via pg-boss job queue.
+  // Extraction + DB write happen via pg-boss job queue (or directly when AI is disabled).
   res.status(200).json({ ok: true });
 
   const { userId } = whitelistEntry;
+
+  if (env.DISABLE_AI) {
+    // When AI is disabled (e.g. during tests), skip the job queue entirely and
+    // create a pending placeholder transaction directly.
+    await getPrisma().transaction.create({
+      data: {
+        userId,
+        description: effectiveSubject || effectiveBody,
+        amount: 0,
+        operationType: OperationType.Outflow,
+        category: Category.Other,
+        subcategory: null,
+        currency: Currency.RON,
+        status: TransactionStatus.Pending,
+        date: new Date(),
+        rawEmailBody: effectiveBody,
+        resolvedByUserId: null,
+      },
+    });
+    return;
+  }
 
   await getQueue().send(CLASSIFY_TRANSACTION_JOB, {
     userId,

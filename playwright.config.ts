@@ -23,7 +23,7 @@ export default defineConfig({
   webServer: [
     {
       command: "bun run dev",
-      url: "http://localhost:3000/api/health",
+      url: "http://127.0.0.1:3001/api/health",
       cwd: "./backend",
       env: { NODE_ENV: "test" },
       reuseExistingServer: false,
@@ -32,6 +32,7 @@ export default defineConfig({
       command: "bun run dev",
       url: "http://localhost:5173",
       cwd: "./frontend",
+      env: { BACKEND_PORT: "3001" },
       reuseExistingServer: false,
     },
   ],

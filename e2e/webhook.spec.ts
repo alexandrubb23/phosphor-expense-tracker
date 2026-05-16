@@ -1,6 +1,6 @@
 import { test, expect, type APIRequestContext } from "@playwright/test";
 
-const BACKEND = "http://localhost:3000";
+const BACKEND = `http://127.0.0.1:${process.env.BACKEND_PORT ?? 3000}`;
 const WEBHOOK_PATH = "/api/webhooks";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -35,7 +35,10 @@ async function addToWhitelist(
   senderEmail: string
 ): Promise<string> {
   const res = await ctx.post("/api/whitelist", { data: { senderEmail } });
-  expect(res.ok(), `Whitelist setup failed with status ${res.status()}`).toBeTruthy();
+  expect(
+    res.ok(),
+    `Whitelist setup failed with status ${res.status()}`
+  ).toBeTruthy();
   const entry = await res.json();
   return entry.id;
 }
@@ -159,10 +162,12 @@ test.describe("Webhook — transaction creation", () => {
     });
     expect(webhookRes.status()).toBe(200);
 
-    // Verify the transaction appears in the pending list
+    // With DISABLE_AI=true the transaction is created synchronously in the webhook handler.
     const listRes = await ctx.get("/api/transactions");
     expect(listRes.ok()).toBeTruthy();
-    const { data: transactions }: { data: Array<{ id: string; rawEmailBody: string; status: string }> } =
+    const {
+      data: transactions,
+    }: { data: Array<{ id: string; rawEmailBody: string; status: string }> } =
       await listRes.json();
 
     const created = transactions.find((tx) => tx.rawEmailBody === body);
@@ -181,11 +186,16 @@ test.describe("Webhook — transaction creation", () => {
     });
 
     const listRes = await ctx.get("/api/transactions");
-    const { data: transactions }: { data: Array<{ id: string; rawEmailBody: string }> } =
+    const {
+      data: transactions,
+    }: { data: Array<{ id: string; rawEmailBody: string }> } =
       await listRes.json();
 
     const created = transactions.find((tx) => tx.rawEmailBody === body);
-    expect(created, "Transaction with expected rawEmailBody not found").toBeDefined();
+    expect(
+      created,
+      "Transaction with expected rawEmailBody not found"
+    ).toBeDefined();
 
     await ctx.delete(`/api/transactions/${created!.id}`);
   });
@@ -197,14 +207,18 @@ test.describe("Webhook — transaction creation", () => {
       multipart: { from: SENDER, subject, text: "" },
     });
 
-    // With DISABLE_AI=true the stub returns a fixed description,
-    // but rawEmailBody should be the subject (effectiveBody = subject when text is empty)
+    // effectiveBody = subject when text is empty, so rawEmailBody === subject.
     const listRes = await ctx.get("/api/transactions");
-    const { data: transactions }: { data: Array<{ id: string; rawEmailBody: string }> } =
+    const {
+      data: transactions,
+    }: { data: Array<{ id: string; rawEmailBody: string }> } =
       await listRes.json();
 
     const created = transactions.find((tx) => tx.rawEmailBody === subject);
-    expect(created, "Transaction using subject as body not found").toBeDefined();
+    expect(
+      created,
+      "Transaction using subject as body not found"
+    ).toBeDefined();
 
     await ctx.delete(`/api/transactions/${created!.id}`);
   });

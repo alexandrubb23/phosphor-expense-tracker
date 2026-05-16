@@ -5,6 +5,7 @@
  * Users created:
  *   - Admin user  (SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD)
  *   - Regular user (TEST_USER_EMAIL / TEST_USER_PASSWORD)
+ *   - AI system user (fixed well-known ID, no password)
  *
  * Usage (called automatically by global-setup):
  *   bun prisma/seed-test.ts
@@ -12,6 +13,7 @@
 
 import { PrismaPg } from "@prisma/adapter-pg";
 import { hashPassword } from "better-auth/crypto";
+import { AI_USER_ID, AI_USER_EMAIL, AI_USER_NAME } from "../src/lib/ai-user.js";
 
 async function main() {
   const databaseUrl = process.env.DATABASE_URL;
@@ -77,6 +79,28 @@ async function main() {
     });
 
     console.log(`  ✅ Created ${role} user: ${email}`);
+  }
+
+  // AI system user (no password, fixed well-known ID)
+  const existingAi = await prisma.user.findUnique({
+    where: { id: AI_USER_ID },
+  });
+  if (!existingAi) {
+    const now = new Date();
+    await prisma.user.create({
+      data: {
+        id: AI_USER_ID,
+        email: AI_USER_EMAIL,
+        name: AI_USER_NAME,
+        emailVerified: false,
+        role: "user",
+        createdAt: now,
+        updatedAt: now,
+      },
+    });
+    console.log(`  ✅ Created AI system user: ${AI_USER_EMAIL}`);
+  } else {
+    console.log(`  AI system user already exists: ${AI_USER_EMAIL}`);
   }
 
   await prisma.$disconnect();

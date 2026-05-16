@@ -23,10 +23,13 @@ export default async function globalSetup() {
     "TEST_USER_EMAIL",
     "TEST_USER_PASSWORD",
     "WEBHOOK_SECRET",
+    "PORT",
   ] as const;
   for (const key of credentialKeys) {
     if (testEnv[key]) process.env[key] = testEnv[key];
   }
+  // Expose backend port so e2e test files can build the correct base URL.
+  process.env.BACKEND_PORT = testEnv.PORT ?? "3001";
 
   const seedEnv = {
     ...process.env,

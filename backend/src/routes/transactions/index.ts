@@ -8,11 +8,11 @@ import {
   TransactionFilterSchema,
   TransactionPaginationSchema,
   TransactionSummaryQuerySchema,
-  OperationType,
   SummaryPeriod,
   type SummaryPeriod as SummaryPeriodType,
 } from "@expense-tracker/core";
 import { HttpNotFoundError } from "../../lib/http-errors.js";
+import { AI_USER_ID } from "../../lib/ai-user.js";
 
 const router = Router();
 const prisma = getPrisma();
@@ -60,38 +60,48 @@ router.get("/summary", async (req, res) => {
   );
 
   const dateRange = getDateRange(period, from, to);
-  const baseWhere = {
-    userId: req.user!.id,
-    deletedAt: null,
-    date: dateRange,
+  const dateGte = dateRange.gte ?? new Date(0);
+  const dateLte = dateRange.lte ?? new Date("9999-12-31");
+
+  type CategorySum = { category: string; total: string };
+
+  type SummaryRow = {
+    total_inflow: string;
+    total_outflow: string;
+    by_category: Array<CategorySum>;
+    total_count: bigint;
+    inflow_count: bigint;
+    outflow_count: bigint;
+    ai_resolved_count: bigint;
+    avg_resolution_ms: number | null;
   };
 
-  const [inflowResult, outflowResult, byCategoryResult] = await Promise.all([
-    prisma.transaction.aggregate({
-      where: { ...baseWhere, operationType: OperationType.Inflow },
-      _sum: { amount: true },
-    }),
-    prisma.transaction.aggregate({
-      where: { ...baseWhere, operationType: OperationType.Outflow },
-      _sum: { amount: true },
-    }),
-    prisma.transaction.groupBy({
-      by: ["category"],
-      where: { ...baseWhere, operationType: OperationType.Outflow },
-      _sum: { amount: true },
-      orderBy: { _sum: { amount: "desc" } },
-    }),
-  ]);
+  const [row] = await prisma.$queryRaw<SummaryRow[]>`
+    SELECT * FROM get_transaction_summary(
+      ${req.user!.id},
+      ${dateGte}::timestamptz,
+      ${dateLte}::timestamptz,
+      ${AI_USER_ID}
+    )
+  `;
+
+  const totalCount = Number(row.total_count);
+  const aiResolvedCount = Number(row.ai_resolved_count);
 
   res.json({
-    totalInflow: Number(inflowResult._sum.amount ?? 0),
-    totalOutflow: Number(outflowResult._sum.amount ?? 0),
-    byCategory: byCategoryResult.map(
-      (r: { category: string; _sum: { amount: number | null } }) => ({
-        category: r.category,
-        total: Number(r._sum.amount ?? 0),
-      })
-    ),
+    totalInflow: Number(row.total_inflow),
+    totalOutflow: Number(row.total_outflow),
+    byCategory: (row.by_category ?? []).map((r: CategorySum) => ({
+      category: r.category,
+      total: Number(r.total),
+    })),
+    totalCount,
+    inflowCount: Number(row.inflow_count),
+    outflowCount: Number(row.outflow_count),
+    aiResolvedCount,
+    aiResolvedPercent:
+      totalCount > 0 ? Math.round((aiResolvedCount / totalCount) * 100) : 0,
+    avgResolutionMs: Number(row.avg_resolution_ms ?? 0),
   });
 });
 

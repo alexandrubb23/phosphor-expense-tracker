@@ -91,6 +91,12 @@ export interface TransactionSummary {
   totalInflow: number;
   totalOutflow: number;
   byCategory: CategoryTotal[];
+  totalCount: number;
+  inflowCount: number;
+  outflowCount: number;
+  aiResolvedCount: number;
+  aiResolvedPercent: number;
+  avgResolutionMs: number;
 }
 
 export const TRANSACTION_SORT_FIELDS = [
