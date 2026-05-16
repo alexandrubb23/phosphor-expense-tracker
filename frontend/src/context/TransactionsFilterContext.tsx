@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   type ReactNode,
 } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -39,9 +40,9 @@ function parseFilter(params: URLSearchParams): TransactionFilter {
   const status = params.get("status");
   const search = params.get("search");
   return {
-    operationType: (
-      Object.values(OperationType) as string[]
-    ).includes(operationType ?? "")
+    operationType: (Object.values(OperationType) as string[]).includes(
+      operationType ?? ""
+    )
       ? (operationType as OperationType)
       : undefined,
     category: (Object.values(Category) as string[]).includes(category ?? "")
@@ -58,7 +59,9 @@ function parseFilter(params: URLSearchParams): TransactionFilter {
 
 function parsePagination(params: URLSearchParams): PaginationState {
   const pageNum = Number(params.get("page") ?? "1");
-  const pageSizeNum = Number(params.get("pageSize") ?? String(DEFAULT_PAGE_SIZE));
+  const pageSizeNum = Number(
+    params.get("pageSize") ?? String(DEFAULT_PAGE_SIZE)
+  );
   const page =
     Number.isFinite(pageNum) && pageNum >= 1 ? Math.floor(pageNum) : 1;
   const pageSize = (VALID_PAGE_SIZES as readonly number[]).includes(pageSizeNum)
@@ -90,6 +93,14 @@ export function TransactionsFilterProvider({
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // Keep refs to the latest values so setFilter can read them without
+  // closing over them — this makes setFilter truly stable (empty dep array)
+  // and prevents the debounce effect from re-running on every URL change.
+  const searchParamsRef = useRef(searchParams);
+  searchParamsRef.current = searchParams;
+  const setSearchParamsRef = useRef(setSearchParams);
+  setSearchParamsRef.current = setSearchParams;
+
   // Reset invalid pagination params immediately so the API never receives NaN
   useEffect(() => {
     if (!hasInvalidPaginationParams(searchParams)) return;
@@ -115,16 +126,17 @@ export function TransactionsFilterProvider({
 
   const setFilter = useCallback(
     (updater: FilterUpdater) => {
+      const prevFilter = parseFilter(searchParamsRef.current);
       const next =
-        typeof updater === "function" ? updater(filter) : updater;
+        typeof updater === "function" ? updater(prevFilter) : updater;
       if (
-        next.search === filter.search &&
-        next.operationType === filter.operationType &&
-        next.category === filter.category &&
-        next.status === filter.status
+        next.search === prevFilter.search &&
+        next.operationType === prevFilter.operationType &&
+        next.category === prevFilter.category &&
+        next.status === prevFilter.status
       )
         return;
-      setSearchParams(
+      setSearchParamsRef.current(
         (prev) => {
           const p = new URLSearchParams(prev);
           next.search ? p.set("search", next.search) : p.delete("search");
@@ -141,7 +153,8 @@ export function TransactionsFilterProvider({
         { replace: true }
       );
     },
-    [filter, setSearchParams]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
   const setPagination = useCallback(

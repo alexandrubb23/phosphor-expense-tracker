@@ -179,4 +179,72 @@ describe("TransactionFilters", () => {
       vi.useRealTimers();
     });
   });
+
+  describe("reset button", () => {
+    it("is hidden when no filters are active", () => {
+      renderWithFilters();
+      expect(
+        screen.queryByRole("button", { name: "Reset all filters" })
+      ).not.toBeInTheDocument();
+    });
+
+    it("clears search param after debounce fires then reset is clicked", async () => {
+      vi.useFakeTimers();
+      const onFilterChange = vi.fn();
+      renderWithFilters(onFilterChange);
+
+      const input = screen.getByPlaceholderText("Search…");
+      fireEvent.change(input, { target: { value: "hello" } });
+
+      // Let debounce fire so search param is written to URL
+      await act(async () => {
+        vi.advanceTimersByTime(350);
+      });
+
+      onFilterChange.mockClear();
+
+      // Click the reset button
+      const resetBtn = screen.getByRole("button", {
+        name: "Reset all filters",
+      });
+      await act(async () => {
+        fireEvent.click(resetBtn);
+      });
+
+      // Advance past debounce to ensure no stale debouncedSearch re-adds the param
+      await act(async () => {
+        vi.advanceTimersByTime(350);
+      });
+
+      expect(onFilterChange).toHaveBeenCalledWith(
+        expect.objectContaining({ search: undefined })
+      );
+      // Must NOT have been called again to re-add the search
+      const calls = onFilterChange.mock.calls;
+      const lastCall = calls[calls.length - 1];
+      expect(lastCall?.[0]).toMatchObject({ search: undefined });
+      vi.useRealTimers();
+    });
+
+    it("clears dropdown filters when reset is clicked", async () => {
+      const user = userEvent.setup();
+      const onFilterChange = vi.fn();
+      renderWithFilters(onFilterChange);
+
+      await user.selectOptions(
+        screen.getAllByRole("combobox")[0],
+        OperationType.Inflow
+      );
+
+      onFilterChange.mockClear();
+
+      await user.click(
+        screen.getByRole("button", { name: "Reset all filters" })
+      );
+
+      expect(onFilterChange).toHaveBeenCalledWith(
+        expect.objectContaining({ operationType: undefined })
+      );
+    });
+  });
 });
