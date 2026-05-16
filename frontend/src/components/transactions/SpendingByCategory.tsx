@@ -66,6 +66,7 @@ function SpendingByCategory() {
             data={data}
             margin={{ top: 20, right: 12, left: 0, bottom: 8 }}
             barCategoryGap="32%"
+            className="[&_*:focus]:outline-none"
           >
             <CartesianGrid
               vertical={false}
