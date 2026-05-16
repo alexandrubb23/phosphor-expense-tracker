@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatTime } from "@/lib/time";
 
 function Clock() {
   const [now, setNow] = useState(new Date());
@@ -8,12 +9,10 @@ function Clock() {
     return () => clearInterval(tick);
   }, []);
 
-  const utc = now.toISOString().slice(11, 19);
-
   return (
     <span className="font-medium text-ink [font-variant-numeric:tabular-nums]">
       <span className="mr-2 font-normal text-muted">T:</span>
-      {utc} UTC
+      {formatTime(now)}
     </span>
   );
 }

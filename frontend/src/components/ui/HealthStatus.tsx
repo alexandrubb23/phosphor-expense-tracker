@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatTime } from "@/lib/time";
 
 interface HealthResponse {
   status: string;
@@ -34,7 +35,7 @@ function HealthStatus() {
     state === "checking"
       ? "PINGING..."
       : state === "online"
-        ? `API ONLINE · ${timestamp ? new Date(timestamp).toISOString().slice(11, 19) + " UTC" : ""}`
+        ? `API ONLINE · ${timestamp ? formatTime(new Date(timestamp)) : ""}`
         : "API UNREACHABLE";
 
   const dotClass =
