@@ -22,6 +22,7 @@ import {
 import { useTransactionsFilter } from "../../context/TransactionsFilterContext";
 import ConfirmDeleteModal from "../ui/ConfirmDeleteModal";
 import EditTransactionModal from "./EditTransactionModal";
+import RefetchButton from "../ui/RefetchButton";
 
 function SortIcon({ isSorted }: { isSorted: false | SortDir }) {
   if (isSorted === SortDir.asc)
@@ -77,7 +78,11 @@ function TransactionsTable() {
     [pagination]
   );
 
-  const { data: result } = useTransactions(sort, filter, apiPagination);
+  const { data: result, refetch } = useTransactions(
+    sort,
+    filter,
+    apiPagination
+  );
   const transactions = result?.data ?? [];
   const totalPages = result?.totalPages ?? 1;
   const total = result?.total ?? 0;
@@ -164,7 +169,7 @@ function TransactionsTable() {
       }),
       columnHelper.display({
         id: "actions",
-        header: "",
+        header: () => <RefetchButton onClick={() => refetch()} />,
         enableSorting: false,
         cell: (info) => {
           const t = info.row.original;
@@ -191,7 +196,7 @@ function TransactionsTable() {
         },
       }),
     ],
-    [handleDelete, handleEdit]
+    [handleDelete, handleEdit, refetch]
   );
 
   const table = useReactTable({

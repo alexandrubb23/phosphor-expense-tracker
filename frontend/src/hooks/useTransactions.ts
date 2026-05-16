@@ -26,6 +26,7 @@ export function useTransactions(
     queryKey: transactionsQueryKey(sort, filter, pagination),
     queryFn: ({ signal }) =>
       transactionsApi.fetchAll(sort, filter, pagination, signal),
+    refetchInterval: 30_000,
   });
 }
 
