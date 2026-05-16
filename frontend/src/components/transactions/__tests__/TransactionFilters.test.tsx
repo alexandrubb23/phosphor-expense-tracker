@@ -2,6 +2,7 @@ import { render, screen, within, fireEvent, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import { useEffect, useRef } from "react";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import {
   OperationType,
   Category,
@@ -34,13 +35,22 @@ function FilterSpy({
 
 function renderWithFilters(
   onFilterChange?: (f: TransactionFilter) => void,
-  initialFilter?: TransactionFilter
+  initialEntry = "/"
 ) {
   return render(
-    <TransactionsFilterProvider initialFilter={initialFilter}>
-      {onFilterChange && <FilterSpy onFilterChange={onFilterChange} />}
-      <TransactionFilters />
-    </TransactionsFilterProvider>
+    <MemoryRouter initialEntries={[initialEntry]}>
+      <Routes>
+        <Route
+          path="*"
+          element={
+            <TransactionsFilterProvider>
+              {onFilterChange && <FilterSpy onFilterChange={onFilterChange} />}
+              <TransactionFilters />
+            </TransactionsFilterProvider>
+          }
+        />
+      </Routes>
+    </MemoryRouter>
   );
 }
 
@@ -155,7 +165,7 @@ describe("TransactionFilters", () => {
     it("clears search when × button is clicked", async () => {
       vi.useFakeTimers();
       const onFilterChange = vi.fn();
-      renderWithFilters(onFilterChange, { search: "foo" });
+      renderWithFilters(onFilterChange, "/?search=foo");
 
       fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
 

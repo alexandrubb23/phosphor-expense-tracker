@@ -25,6 +25,14 @@ export default function TransactionFilters() {
     });
   }, [debouncedSearch, setFilter]);
 
+  // Sync local input when filter.search changes externally (e.g. browser back/forward)
+  useEffect(() => {
+    setSearchInput((prev) => {
+      const external = filter.search ?? "";
+      return prev === external ? prev : external;
+    });
+  }, [filter.search]);
+
   const handleClearSearch = useCallback(() => {
     setSearchInput("");
   }, []);

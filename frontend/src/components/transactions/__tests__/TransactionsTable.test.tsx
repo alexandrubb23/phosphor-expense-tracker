@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import {
   OperationType,
   Category,
@@ -91,9 +92,18 @@ function setupTransactions(data: Transaction[] = []) {
 
 function renderTransactionsTable() {
   return render(
-    <TransactionsFilterProvider>
-      <TransactionsTable />
-    </TransactionsFilterProvider>
+    <MemoryRouter>
+      <Routes>
+        <Route
+          path="*"
+          element={
+            <TransactionsFilterProvider>
+              <TransactionsTable />
+            </TransactionsFilterProvider>
+          }
+        />
+      </Routes>
+    </MemoryRouter>
   );
 }
 

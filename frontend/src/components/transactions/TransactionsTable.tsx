@@ -3,7 +3,6 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
-  type PaginationState,
   type SortingState,
 } from "@tanstack/react-table";
 import {
@@ -12,7 +11,7 @@ import {
   SortDir,
   type TransactionSortField,
 } from "@expense-tracker/core";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { CATEGORY_COLORS } from "../../categoryColors";
 import { Transaction } from "../../api/transactions";
 import {
@@ -45,19 +44,10 @@ const shortId = (id: string) => `TX-${id.slice(-4).toUpperCase()}`;
 const formatDate = (iso: string) => iso.slice(0, 10);
 
 function TransactionsTable() {
-  const { filter } = useTransactionsFilter();
+  const { filter, pagination, setPagination } = useTransactionsFilter();
   const [sorting, setSorting] = useState<SortingState>([
     { id: "date", desc: true },
   ]);
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-
-  // Reset to first page whenever filter changes
-  useEffect(() => {
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [filter]);
 
   const sort = useMemo(
     () =>
