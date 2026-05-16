@@ -14,7 +14,11 @@ export function appRoutes(app: Application): void {
   app.use("/api/health", healthRouter);
 
   // Public webhook — secret verified via X-Webhook-Secret header
-  app.use("/api/webhooks", requireWebhookSecret, emailWebhookRouter);
+  app.use(
+    "/api/webhooks/inbound-email",
+    requireWebhookSecret,
+    emailWebhookRouter
+  );
 
   app.use(
     "/api/admin/users",

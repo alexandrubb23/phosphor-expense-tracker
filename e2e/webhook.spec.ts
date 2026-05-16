@@ -1,7 +1,7 @@
 import { test, expect, type APIRequestContext } from "@playwright/test";
 
 const BACKEND = `http://127.0.0.1:${process.env.BACKEND_PORT ?? 3000}`;
-const WEBHOOK_PATH = "/api/webhooks";
+const WEBHOOK_PATH = "/api/webhooks/inbound-email";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
