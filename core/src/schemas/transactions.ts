@@ -101,6 +101,7 @@ export interface TransactionSummary {
 
 export const TRANSACTION_SORT_FIELDS = [
   "date",
+  "createdAt",
   "amount",
   "description",
   "category",

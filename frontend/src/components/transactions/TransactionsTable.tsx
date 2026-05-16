@@ -22,6 +22,7 @@ import { useTransactionsFilter } from "../../context/TransactionsFilterContext";
 import ConfirmDeleteModal from "../ui/ConfirmDeleteModal";
 import EditTransactionModal from "./EditTransactionModal";
 import RefetchButton from "../ui/RefetchButton";
+import { formatTime } from "@/lib/time";
 
 function SortIcon({ isSorted }: { isSorted: false | SortDir }) {
   if (isSorted === SortDir.asc)
@@ -103,6 +104,12 @@ function TransactionsTable() {
         header: "T·STAMP",
         enableSorting: true,
         cell: (info) => formatDate(info.getValue()),
+      }),
+      columnHelper.accessor("createdAt", {
+        id: "createdAt",
+        header: "T·IME",
+        enableSorting: true,
+        cell: (info) => formatTime(new Date(info.getValue())),
       }),
       columnHelper.accessor("description", {
         id: "description",
@@ -267,6 +274,7 @@ function TransactionsTable() {
                         const isCategoryCol = cell.column.id === "category";
                         const isStatusCol = cell.column.id === "status";
                         const isDateCol = cell.column.id === "date";
+                        const isCreatedAtCol = cell.column.id === "createdAt";
                         return (
                           <td
                             key={cell.id}
@@ -277,6 +285,9 @@ function TransactionsTable() {
                                 : "",
                               isDateCol
                                 ? "w-27.5 font-mono text-[11px] tracking-[0.06em] text-ink-soft"
+                                : "",
+                              isCreatedAtCol
+                                ? "w-32 font-mono text-[11px] tracking-[0.06em] text-ink-soft"
                                 : "",
                               cell.column.id === "description"
                                 ? "font-body text-sm font-normal text-ink"
