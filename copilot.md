@@ -80,6 +80,7 @@ AlexB/                        ← monorepo root (Bun workspaces)
 | ORM | Prisma (PostgreSQL) — not yet scaffolded |
 | Auth | Better Auth (Express adapter, database sessions — no JWTs) |
 | Charts | Recharts |
+| React utility hooks | usehooks-ts |
 | AI extraction | Vercel AI SDK + OpenAI GPT-4o + Zod schemas |
 | Email ingestion | SendGrid Inbound Parse → Express webhook |
 | Deployment | Vercel (frontend) + Railway/Render (backend + DB) |
@@ -103,6 +104,7 @@ cd frontend && npm run test:watch  # component tests in watch mode
 - All frontend source is TypeScript (`.ts` / `.tsx`). No `.js` / `.jsx` in `frontend/`.
 - Shared domain types live in `frontend/src/types.ts`. Import from there, do not redeclare.
 - Use `@/` alias for all internal frontend imports (`@/` maps to `frontend/src/`).
+- **Never add raw `addEventListener` / `removeEventListener` calls in components or hooks.** Use [`usehooks-ts`](https://usehooks-ts.com) instead — prefer `useOnClickOutside` for outside-click detection, `useEventListener` for all other DOM events, and any other hook from the library that covers the use-case.
 - Express routes are Express `Router` instances exported from `backend/src/routes/`.  
   Mount them in `backend/src/index.ts` under `/api/<resource>`.
 - CORS is configured in `backend/src/index.ts`; `credentials: true` is required for session cookies.
