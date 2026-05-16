@@ -11,6 +11,8 @@ import { transactionsApi, type Transaction } from "@/api/transactions";
 
 export type { Transaction };
 
+export const TRANSACTIONS_REFETCH_INTERVAL = 30_000;
+
 export const transactionsQueryKey = (
   sort?: TransactionSort,
   filter?: TransactionFilter,
@@ -26,7 +28,7 @@ export function useTransactions(
     queryKey: transactionsQueryKey(sort, filter, pagination),
     queryFn: ({ signal }) =>
       transactionsApi.fetchAll(sort, filter, pagination, signal),
-    refetchInterval: 30_000,
+    refetchInterval: TRANSACTIONS_REFETCH_INTERVAL,
   });
 }
 
@@ -34,6 +36,7 @@ export function useTransactionSummary(query: TransactionSummaryQuery) {
   return useQuery({
     queryKey: ["transactions", "summary", query],
     queryFn: ({ signal }) => transactionsApi.fetchSummary(query, signal),
+    refetchInterval: TRANSACTIONS_REFETCH_INTERVAL,
   });
 }
 
