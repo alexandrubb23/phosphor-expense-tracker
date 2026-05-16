@@ -219,104 +219,103 @@ function TransactionsTable() {
         </p>
       ) : (
         <>
-          <table className="w-full border-collapse border border-hairline bg-panel">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr
-                  key={headerGroup.id}
-                  className="border-b border-cyan-dim bg-surface"
-                >
-                  {headerGroup.headers.map((header) => {
-                    const canSort = header.column.getCanSort();
-                    const sorted = header.column.getIsSorted();
-                    const isAmountCol = header.column.id === "amount";
-                    const isStatusCol = header.column.id === "status";
-                    const isIdCol = header.column.id === "id";
-                    const isActionsCol = header.column.id === "actions";
-                    return (
-                      <th
-                        key={header.id}
-                        className={[
-                          "px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan",
-                          isAmountCol || isActionsCol
-                            ? "text-right"
-                            : "text-left",
-                          isStatusCol || isIdCol ? "max-sm:hidden" : "",
-                          canSort
-                            ? "cursor-pointer select-none hover:text-ink-soft"
-                            : "",
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
-                        onClick={
-                          canSort
-                            ? header.column.getToggleSortingHandler()
-                            : undefined
-                        }
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        {canSort && <SortIcon isSorted={sorted} />}
-                      </th>
-                    );
-                  })}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.map((row) => {
-                return (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-160 border-collapse border border-hairline bg-panel">
+              <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
                   <tr
-                    key={row.id}
-                    className="group relative border-b border-hairline transition-colors duration-200 hover:bg-panel-raised"
+                    key={headerGroup.id}
+                    className="border-b border-cyan-dim bg-surface"
                   >
-                    {row.getVisibleCells().map((cell) => {
-                      const isAmountCol = cell.column.id === "amount";
-                      const isActionsCol = cell.column.id === "actions";
-                      const isIdCol = cell.column.id === "id";
-                      const isCategoryCol = cell.column.id === "category";
-                      const isStatusCol = cell.column.id === "status";
-                      const isDateCol = cell.column.id === "date";
+                    {headerGroup.headers.map((header) => {
+                      const canSort = header.column.getCanSort();
+                      const sorted = header.column.getIsSorted();
+                      const isAmountCol = header.column.id === "amount";
+                      const isActionsCol = header.column.id === "actions";
                       return (
-                        <td
-                          key={cell.id}
+                        <th
+                          key={header.id}
                           className={[
-                            "px-4.5 py-4 align-middle",
-                            isIdCol
-                              ? "w-22.5 font-mono text-[11px] tracking-[0.04em] text-muted max-sm:hidden"
+                            "px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan",
+                            isAmountCol || isActionsCol
+                              ? "text-right"
+                              : "text-left",
+                            canSort
+                              ? "cursor-pointer select-none hover:text-ink-soft"
                               : "",
-                            isDateCol
-                              ? "w-27.5 font-mono text-[11px] tracking-[0.06em] text-ink-soft"
-                              : "",
-                            cell.column.id === "description"
-                              ? "font-body text-sm font-normal text-ink"
-                              : "",
-                            isCategoryCol
-                              ? "font-mono text-[10px] uppercase tracking-[0.22em] text-ink-soft max-sm:hidden"
-                              : "",
-                            isStatusCol
-                              ? "font-mono text-[10px] uppercase tracking-[0.18em] max-sm:hidden"
-                              : "",
-                            isAmountCol ? "text-right" : "",
-                            isActionsCol ? "w-15 text-right" : "",
                           ]
                             .filter(Boolean)
                             .join(" ")}
+                          onClick={
+                            canSort
+                              ? header.column.getToggleSortingHandler()
+                              : undefined
+                          }
                         >
                           {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
+                            header.column.columnDef.header,
+                            header.getContext()
                           )}
-                        </td>
+                          {canSort && <SortIcon isSorted={sorted} />}
+                        </th>
                       );
                     })}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map((row) => {
+                  return (
+                    <tr
+                      key={row.id}
+                      className="group relative border-b border-hairline transition-colors duration-200 hover:bg-panel-raised"
+                    >
+                      {row.getVisibleCells().map((cell) => {
+                        const isAmountCol = cell.column.id === "amount";
+                        const isActionsCol = cell.column.id === "actions";
+                        const isIdCol = cell.column.id === "id";
+                        const isCategoryCol = cell.column.id === "category";
+                        const isStatusCol = cell.column.id === "status";
+                        const isDateCol = cell.column.id === "date";
+                        return (
+                          <td
+                            key={cell.id}
+                            className={[
+                              "px-4.5 py-4 align-middle",
+                              isIdCol
+                                ? "w-22.5 font-mono text-[11px] tracking-[0.04em] text-muted"
+                                : "",
+                              isDateCol
+                                ? "w-27.5 font-mono text-[11px] tracking-[0.06em] text-ink-soft"
+                                : "",
+                              cell.column.id === "description"
+                                ? "font-body text-sm font-normal text-ink"
+                                : "",
+                              isCategoryCol
+                                ? "font-mono text-[10px] uppercase tracking-[0.22em] text-ink-soft"
+                                : "",
+                              isStatusCol
+                                ? "font-mono text-[10px] uppercase tracking-[0.18em]"
+                                : "",
+                              isAmountCol ? "text-right" : "",
+                              isActionsCol ? "w-15 text-right" : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
           {/* Pagination controls */}
           <div className="mt-0 flex items-center justify-between border border-t-0 border-hairline bg-surface px-4.5 py-3">
