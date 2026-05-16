@@ -12,6 +12,7 @@ import {
   CustomTooltip,
   type ChartEntry,
 } from "./spendingCategoryChartUtils";
+import currency from "../../lib/currency";
 
 interface Props {
   data: ChartEntry[];
@@ -44,7 +45,7 @@ export default function SpendingByCategoryDesktopChart({ data }: Props) {
           axisLine={false}
           tickLine={false}
           tick={{ dx: -4 }}
-          tickFormatter={(v: number) => `$${v}`}
+          tickFormatter={(v: number) => `${currency}${v}`}
           width={60}
         />
         <Tooltip

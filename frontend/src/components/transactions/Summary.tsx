@@ -1,6 +1,7 @@
 import { useCountUp } from "../../hooks/useCountUp";
 import { useTransactionSummary } from "../../hooks/useTransactions";
 import { useSummaryPeriod } from "../../context/SummaryPeriodContext";
+import currency from "../../lib/currency";
 
 function Summary() {
   const { query } = useSummaryPeriod();
@@ -52,7 +53,7 @@ function Summary() {
             <span
               className={`mt-[0.22em] text-[0.42em] font-normal ${isNegative ? "text-red" : "text-cyan"}`}
             >
-              {isNegative ? "−$" : "$"}
+              {isNegative ? `−${currency}` : currency}
             </span>
             {fmt(animatedBalance)}
           </div>
@@ -67,7 +68,8 @@ function Summary() {
               Inflow
             </span>
             <span className="inline-flex items-baseline gap-2.5 font-mono text-2xl font-medium tracking-[-0.02em] text-green tabular-nums">
-              <span className="text-[0.85em] opacity-85">▲</span>$
+              <span className="text-[0.85em] opacity-85">▲</span>
+              {currency}
               {fmt(animatedIncome)}
             </span>
           </div>
@@ -79,7 +81,8 @@ function Summary() {
               Outflow
             </span>
             <span className="inline-flex items-baseline gap-2.5 font-mono text-2xl font-medium tracking-[-0.02em] text-red tabular-nums">
-              <span className="text-[0.85em] opacity-85">▼</span>$
+              <span className="text-[0.85em] opacity-85">▼</span>
+              {currency}
               {fmt(animatedExpenses)}
             </span>
           </div>

@@ -12,6 +12,7 @@ import {
   CustomTooltip,
   type ChartEntry,
 } from "./spendingCategoryChartUtils";
+import currency from "../../lib/currency";
 
 interface Props {
   data: ChartEntry[];
@@ -37,7 +38,7 @@ export default function SpendingByCategoryMobileChart({ data }: Props) {
           axisLine={false}
           tickLine={false}
           tick={{ fontSize: 9 }}
-          tickFormatter={(v: number) => `$${v}`}
+          tickFormatter={(v: number) => `${currency}${v}`}
         />
         <YAxis
           type="category"
