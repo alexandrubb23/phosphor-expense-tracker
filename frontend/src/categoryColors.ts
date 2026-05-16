@@ -8,6 +8,12 @@ export const CATEGORY_COLORS: Record<string, string> = {
   [Category.Entertainment]: "#ff3a5c",
   [Category.Salary]: "#5cf3ff",
   [Category.Other]: "#5a7080",
+  [Category.Healthcare]: "#ff6eb4",
+  [Category.Education]: "#7ee8a2",
+  [Category.Shopping]: "#ffd166",
+  [Category.Travel]: "#06d6a0",
+  [Category.Insurance]: "#c77dff",
+  [Category.Subscriptions]: "#ff9a3c",
 };
 
 export const CATEGORY_COLOR_FALLBACK = Object.values(CATEGORY_COLORS);

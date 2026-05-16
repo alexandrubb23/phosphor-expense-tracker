@@ -6,4 +6,10 @@ export enum Category {
   Entertainment = "Entertainment",
   Salary = "Salary",
   Other = "Other",
+  Healthcare = "Healthcare",
+  Education = "Education",
+  Shopping = "Shopping",
+  Travel = "Travel",
+  Insurance = "Insurance",
+  Subscriptions = "Subscriptions",
 }

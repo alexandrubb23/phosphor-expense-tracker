@@ -33,6 +33,12 @@ enum Category {
   Entertainment
   Salary
   Other
+  Healthcare
+  Education
+  Shopping
+  Travel
+  Insurance
+  Subscriptions
 }
 
 enum Currency {
