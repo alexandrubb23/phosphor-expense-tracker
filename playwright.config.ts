@@ -32,7 +32,10 @@ export default defineConfig({
       command: "bun run dev",
       url: "http://localhost:5173",
       cwd: "./frontend",
-      env: { BACKEND_PORT: "3001" },
+      // VITE_API_URL="" forces relative /api/* paths so requests are handled
+      // by the Vite proxy (→ backend port 3001) instead of going directly to
+      // the dev backend on port 3000.
+      env: { BACKEND_PORT: "3001", VITE_API_URL: "" },
       reuseExistingServer: false,
     },
   ],

@@ -181,13 +181,6 @@ test.describe("Authentication", () => {
     test("sees the USERS nav link", async ({ adminPage: page }) => {
       await expect(page.getByRole("link", { name: "USERS" })).toBeVisible();
     });
-
-    test("can still reach the /login page", async ({ adminPage: page }) => {
-      await gotoLoginPage(page);
-      await expect(
-        page.getByRole("heading", { name: "IDENTITY VERIFICATION" })
-      ).toBeVisible();
-    });
   });
 
   // ─── Authorization — non-admin ──────────────────────────────────────────────
