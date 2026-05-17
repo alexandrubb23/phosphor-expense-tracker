@@ -1,5 +1,6 @@
 import Clock from "./Clock";
 import { DesktopNav, MobileMenu } from "./MastheadNav";
+import ThemeToggle from "./ThemeToggle";
 
 interface MastheadProps {
   sectorLabel: string;
@@ -36,13 +37,15 @@ export default function Masthead({
         className={
           actions
             ? "flex items-center gap-5 max-sm:w-full max-sm:justify-between"
-            : undefined
+            : "flex items-center gap-3"
         }
       >
         <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
           {sectorLabel} <span className="text-cyan">// {sectorAccent}</span> ·{" "}
           {starDate}
         </div>
+
+        <ThemeToggle />
 
         {actions && <DesktopNav>{actions}</DesktopNav>}
         {actions && <MobileMenu>{actions}</MobileMenu>}

@@ -75,6 +75,10 @@
     background: #03060a;
   }
 
+  html.light, html.light body {
+    background: #f5f7fa;
+  }
+
   body {
     font-family: "IBM Plex Sans", system-ui, sans-serif;
     color: #d8e8f0;
@@ -88,6 +92,10 @@
     position: relative;
   }
 
+  html.light body {
+    color: #1a2a38;
+  }
+
   body::before {
     content: "";
     position: fixed;
@@ -98,6 +106,13 @@
       radial-gradient(ellipse 80% 60% at 20% 0%, rgba(0, 229, 255, 0.08) 0%, transparent 55%),
       radial-gradient(ellipse 60% 40% at 100% 50%, rgba(0, 152, 181, 0.06) 0%, transparent 60%),
       radial-gradient(ellipse 70% 50% at 50% 100%, rgba(255, 58, 92, 0.05) 0%, transparent 55%);
+  }
+
+  html.light body::before {
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 0%, rgba(0, 140, 200, 0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 40% at 100% 50%, rgba(0, 120, 160, 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at 50% 100%, rgba(200, 40, 80, 0.04) 0%, transparent 55%);
   }
 
   body::after {
@@ -114,6 +129,10 @@
       transparent 4px
     );
     mix-blend-mode: screen;
+  }
+
+  html.light body::after {
+    display: none;
   }
 
   #root {
@@ -238,8 +257,9 @@
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
+  /* Use the cyberpunk muted value so text-muted is visible on dark bg */
+  --muted: #5a7080;
+  --muted-foreground: #9aabb8;
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
@@ -259,4 +279,52 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* ─── Light mode overrides ─────────────────────────────────────────────────── */
+html.light {
+  /* Custom design-system palette */
+  --color-bg: #f5f7fa;
+  --color-bg-deep: #eef1f6;
+  --color-surface: #ffffff;
+  --color-panel: #f0f4f9;
+  --color-panel-raised: #e8edf6;
+  --color-hairline: #d0d9e8;
+  --color-hairline-glow: #b0c4da;
+  --color-hairline-hot: #8aaac8;
+  --color-ink: #1a2a38;
+  --color-ink-soft: #4a6278;
+  --color-muted: #6a8298;
+  --color-muted-soft: #d8e4ef;
+  --color-cyan: #0284c7;
+  --color-cyan-bright: #0ea5e9;
+  --color-cyan-dim: #0369a1;
+  --color-cyan-wash: rgba(2, 132, 199, 0.08);
+  --color-amber: #d97706;
+  --color-red: #e11d48;
+  --color-green: #059669;
+
+  /* shadcn semantic tokens */
+  --background: oklch(0.975 0.004 240);
+  --foreground: oklch(0.2 0.02 240);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.02 240);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.02 240);
+  --primary: oklch(0.4 0.12 240);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.94 0.005 240);
+  --secondary-foreground: oklch(0.2 0.02 240);
+  --muted: #6a8298;
+  --muted-foreground: #4a6278;
+  --accent: oklch(0.94 0.005 240);
+  --accent-foreground: oklch(0.2 0.02 240);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.88 0.01 240);
+  --input: oklch(0.88 0.01 240);
+  --ring: oklch(0.55 0.1 240);
+  --sidebar: oklch(0.96 0.004 240);
+  --sidebar-foreground: oklch(0.2 0.02 240);
+  --sidebar-border: oklch(0.88 0.01 240);
+  --sidebar-ring: oklch(0.55 0.1 240);
 }
