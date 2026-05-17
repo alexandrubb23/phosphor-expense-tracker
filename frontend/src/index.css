@@ -73,6 +73,7 @@
 
   html, body {
     background: #03060a;
+    overflow-x: hidden;
   }
 
   html.light, html.light body {
