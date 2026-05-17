@@ -1,0 +1,2 @@
+# Explicitly use the Bun provider so Nixpacks doesn't fall back to Node.
+providers = ["bun"]

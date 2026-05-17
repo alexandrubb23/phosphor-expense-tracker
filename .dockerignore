@@ -1,0 +1,30 @@
+# Dependencies
+node_modules
+*/node_modules
+
+# Build outputs
+frontend/dist
+backend/dist
+backend/src/generated
+
+# Git
+.git
+.gitignore
+
+# Environment files (injected by Railway / Docker Compose)
+.env
+.env.*
+!.env.example
+!.env.test.example
+
+# Test artefacts
+playwright-report
+e2e/test-results
+
+# Editor / OS
+.DS_Store
+*.log
+*.local
+
+# Bun cache
+.bun
