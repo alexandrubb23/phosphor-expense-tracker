@@ -1,4 +1,5 @@
 import type { Application } from "express";
+import * as Sentry from "@sentry/node";
 import { errorHandler } from "./middleware/errorHandler.js";
 import healthRouter from "./routes/health.js";
 import adminUsersRouter from "./routes/admin/users.js";
@@ -34,6 +35,9 @@ export function appRoutes(app: Application): void {
   app.use((_req, res) => {
     res.status(404).json({ error: "Not found" });
   });
+
+  // Sentry error handler — must be before the custom error handler
+  Sentry.setupExpressErrorHandler(app);
 
   // Global error handler — must be registered last
   app.use(errorHandler);

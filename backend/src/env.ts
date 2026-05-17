@@ -22,6 +22,7 @@ export const env = createEnv({
       .enum(["true", "false", "1", "0"])
       .transform((v) => v === "true" || v === "1")
       .default(false),
+    SENTRY_DSN: z.url().optional(),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,

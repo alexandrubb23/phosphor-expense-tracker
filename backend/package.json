@@ -13,6 +13,7 @@
     "@expense-tracker/core": "*",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@sentry/node": "^10.53.1",
     "@t3-oss/env-core": "^0.13.11",
     "ai": "^6.0.182",
     "better-auth": "^1.6.11",

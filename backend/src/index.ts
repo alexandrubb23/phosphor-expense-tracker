@@ -1,3 +1,4 @@
+import "./instrument.js";
 import { createApp } from "./createApp.js";
 import { env } from "./env.js";
 import { startQueue } from "./lib/queue.js";
