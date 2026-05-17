@@ -46,7 +46,7 @@ export default function SpendingByCategoryDesktopChart({ data }: Props) {
           tickLine={false}
           tick={{ dx: -4 }}
           tickFormatter={(v: number) => formatCurrency(v)}
-          width={60}
+          width={90}
         />
         <Tooltip
           content={<CustomTooltip />}
