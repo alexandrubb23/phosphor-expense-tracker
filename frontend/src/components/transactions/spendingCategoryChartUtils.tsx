@@ -1,7 +1,7 @@
 import { Rectangle } from "recharts";
 import type { BarShapeProps } from "recharts/types/cartesian/Bar";
 import { CATEGORY_COLORS, CATEGORY_COLOR_FALLBACK } from "../../categoryColors";
-import currency from "../../lib/currency";
+import { formatCurrency } from "@/lib/currency";
 
 export interface ChartEntry {
   name: string;
@@ -29,8 +29,7 @@ export function CustomTooltip({
         ▸ {entry.payload.name}
       </div>
       <div className="text-[15px] font-medium text-cyan">
-        {currency}
-        {entry.value.toLocaleString()}
+        {formatCurrency(entry.value)}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { useCountUp } from "../../hooks/useCountUp";
 import { useTransactionSummary } from "../../hooks/useTransactions";
 import { useSummaryPeriod } from "../../context/SummaryPeriodContext";
-import currency from "../../lib/currency";
+import currency, { formatCurrency } from "@/lib/currency";
 
 function Summary() {
   const { query } = useSummaryPeriod();
@@ -50,12 +50,19 @@ function Summary() {
           <div
             className={`flex items-start gap-[0.04em] font-display text-[clamp(64px,12.5vw,156px)] font-medium leading-[0.95] tracking-[-0.04em] tabular-nums ${isNegative ? "text-red" : "text-ink"}`}
           >
+            {isNegative && (
+              <span
+                className="mt-[0.22em] text-[0.42em] font-normal text-red"
+              >
+                −
+              </span>
+            )}
+            {fmt(animatedBalance)}
             <span
               className={`mt-[0.22em] text-[0.42em] font-normal ${isNegative ? "text-red" : "text-cyan"}`}
             >
-              {isNegative ? `−${currency}` : currency}
+              {currency}
             </span>
-            {fmt(animatedBalance)}
           </div>
         </div>
 
@@ -69,8 +76,7 @@ function Summary() {
             </span>
             <span className="inline-flex items-baseline gap-2.5 font-mono text-2xl font-medium tracking-[-0.02em] text-green tabular-nums">
               <span className="text-[0.85em] opacity-85">▲</span>
-              {currency}
-              {fmt(animatedIncome)}
+              {formatCurrency(animatedIncome)}
             </span>
           </div>
           <div className="relative flex flex-col gap-2.5 bg-panel px-5.5 py-5">
@@ -82,8 +88,7 @@ function Summary() {
             </span>
             <span className="inline-flex items-baseline gap-2.5 font-mono text-2xl font-medium tracking-[-0.02em] text-red tabular-nums">
               <span className="text-[0.85em] opacity-85">▼</span>
-              {currency}
-              {fmt(animatedExpenses)}
+              {formatCurrency(animatedExpenses)}
             </span>
           </div>
         </div>

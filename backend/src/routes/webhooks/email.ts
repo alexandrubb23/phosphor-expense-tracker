@@ -40,8 +40,8 @@ router.post("/", upload.none(), async (req, res) => {
     where: { senderEmail },
   });
 
-  // Silent reject — return 200 to prevent SendGrid from retrying
   if (!whitelistEntry) {
+    // Silently accept so SendGrid doesn't retry unknown senders.
     res.status(200).json({ ok: true });
     return;
   }
