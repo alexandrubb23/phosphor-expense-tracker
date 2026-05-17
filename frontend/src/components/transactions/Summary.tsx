@@ -1,7 +1,7 @@
 import { useCountUp } from "../../hooks/useCountUp";
 import { useTransactionSummary } from "../../hooks/useTransactions";
 import { useSummaryPeriod } from "../../context/SummaryPeriodContext";
-import currency, { formatCurrency } from "@/lib/currency";
+import { CURRENCY_CODE, formatCurrency } from "@/lib/currency";
 
 function Summary() {
   const { query } = useSummaryPeriod();
@@ -51,9 +51,7 @@ function Summary() {
             className={`flex items-start gap-[0.04em] font-display text-[clamp(64px,12.5vw,156px)] font-medium leading-[0.95] tracking-[-0.04em] tabular-nums ${isNegative ? "text-red" : "text-ink"}`}
           >
             {isNegative && (
-              <span
-                className="mt-[0.22em] text-[0.42em] font-normal text-red"
-              >
+              <span className="mt-[0.22em] text-[0.42em] font-normal text-red">
                 −
               </span>
             )}
@@ -61,7 +59,7 @@ function Summary() {
             <span
               className={`mt-[0.22em] text-[0.42em] font-normal ${isNegative ? "text-red" : "text-cyan"}`}
             >
-              {currency}
+              {CURRENCY_CODE}
             </span>
           </div>
         </div>
