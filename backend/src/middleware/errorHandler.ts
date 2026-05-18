@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import * as Sentry from "@sentry/node";
-import { HttpCodeError } from "../lib/http-errors";
+import { HttpCodeError } from "@/lib/http-errors";
 
 /**
  * Global Express error handler — must be registered as the last middleware.

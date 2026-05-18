@@ -7,13 +7,13 @@ import {
   Role,
   SortDir,
 } from "@expense-tracker/core";
-import { getPrisma } from "../../lib/prisma.js";
-import { validate } from "../../lib/validate.js";
+import { getPrisma } from "@/lib/prisma";
+import { validate } from "@/lib/validate";
 import {
   HttpConflictError,
   HttpForbiddenError,
   HttpNotFoundError,
-} from "../../lib/http-errors.js";
+} from "@/lib/http-errors";
 
 const router = Router();
 const prisma = getPrisma();

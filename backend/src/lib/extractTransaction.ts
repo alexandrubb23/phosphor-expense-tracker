@@ -7,7 +7,7 @@ import {
   Category,
   Confidence,
 } from "@expense-tracker/core";
-import { env } from "../env.js";
+import { env } from "@/env";
 
 const SYSTEM_PROMPT = `Extract financial transaction details from the email.
 - description: concise "merchant — item/type" format (e.g. "Mega Image — food and drink"); never echo the raw input verbatim

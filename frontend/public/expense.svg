@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" aria-hidden="true" role="img">
+  <rect width="32" height="32" rx="8" fill="#03060a"/>
+  <!-- Receipt body -->
+  <rect x="7" y="4" width="18" height="22" rx="2" fill="#0d1f2d" stroke="#00e5ff" stroke-width="1.2"/>
+  <!-- Dollar sign circle -->
+  <circle cx="16" cy="13" r="5" fill="none" stroke="#00e5ff" stroke-width="1.4"/>
+  <text x="16" y="17" text-anchor="middle" font-family="monospace" font-size="7" font-weight="bold" fill="#00e5ff">$</text>
+  <!-- Receipt lines -->
+  <line x1="10" y1="22" x2="22" y2="22" stroke="#00e5ff" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+  <line x1="10" y1="24.5" x2="18" y2="24.5" stroke="#00e5ff" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+  <!-- Zigzag bottom -->
+  <polyline points="7,26 8.5,28 10,26 11.5,28 13,26 14.5,28 16,26 17.5,28 19,26 20.5,28 22,26 23.5,28 25,26" stroke="#00e5ff" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

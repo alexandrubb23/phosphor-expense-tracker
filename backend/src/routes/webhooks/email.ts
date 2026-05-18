@@ -1,9 +1,9 @@
 import { Router } from "express";
 import multer from "multer";
-import { getQueue } from "../../lib/queue.js";
-import { CLASSIFY_TRANSACTION_JOB } from "../../jobs/classifyTransaction.js";
-import { getPrisma } from "../../lib/prisma.js";
-import { env } from "../../env.js";
+import { getQueue } from "@/lib/queue";
+import { CLASSIFY_TRANSACTION_JOB } from "@/jobs/classifyTransaction";
+import { getPrisma } from "@/lib/prisma";
+import { env } from "@/env";
 import {
   TransactionStatus,
   Currency,

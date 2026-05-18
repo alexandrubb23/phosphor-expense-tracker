@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { getPrisma } from "./prisma.js";
-import { env } from "../env.js";
+import { getPrisma } from "@/lib/prisma";
+import { env } from "@/env";
 import { Role } from "@expense-tracker/core";
 
 export const auth = betterAuth({

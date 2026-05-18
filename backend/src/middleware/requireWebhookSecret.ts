@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import { env } from "../env.js";
-import { HttpUnauthorizedError } from "../lib/http-errors.js";
+import { env } from "@/env";
+import { HttpUnauthorizedError } from "@/lib/http-errors";
 
 /**
  * Verifies the webhook secret from either `X-Webhook-Secret` header or `?secret` query param.

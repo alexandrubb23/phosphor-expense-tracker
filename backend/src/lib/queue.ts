@@ -1,10 +1,10 @@
 import PgBoss from "pg-boss";
-import { env } from "../env.js";
+import { env } from "@/env";
 import {
   CLASSIFY_TRANSACTION_JOB,
   classifyTransactionWorker,
   type ClassifyTransactionPayload,
-} from "../jobs/classifyTransaction.js";
+} from "@/jobs/classifyTransaction";
 
 let _queue: PgBoss | null = null;
 

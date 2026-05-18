@@ -1,7 +1,7 @@
-import "./instrument.js";
-import { createApp } from "./createApp.js";
-import { env } from "./env.js";
-import { startQueue } from "./lib/queue.js";
+import "@/instrument";
+import { createApp } from "@/createApp";
+import { env } from "@/env";
+import { startQueue } from "@/lib/queue";
 
 const app = createApp();
 

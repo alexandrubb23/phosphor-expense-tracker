@@ -104,6 +104,7 @@ cd frontend && npm run test:watch  # component tests in watch mode
 - All frontend source is TypeScript (`.ts` / `.tsx`). No `.js` / `.jsx` in `frontend/`.
 - Shared domain types live in `frontend/src/types.ts`. Import from there, do not redeclare.
 - Use `@/` alias for all internal frontend imports (`@/` maps to `frontend/src/`).
+- Use `@/` alias for all internal backend imports (`@/` maps to `backend/src/`). Never use relative `../` paths or `.js` extensions in backend source files.
 - **Never add raw `addEventListener` / `removeEventListener` calls in components or hooks.** Use [`usehooks-ts`](https://usehooks-ts.com) instead — prefer `useOnClickOutside` for outside-click detection, `useEventListener` for all other DOM events, and any other hook from the library that covers the use-case.
 - Express routes are Express `Router` instances exported from `backend/src/routes/`.  
   Mount them in `backend/src/index.ts` under `/api/<resource>`.
@@ -406,9 +407,9 @@ role: Role.user       // assignment
 ### Adding auth to a new API route (backend)
 Use Better Auth's `auth.api.getSession` to verify the session in protected route handlers:
 ```ts
-import { auth } from "../lib/auth.js";
+import { auth } from "@/lib/auth";
 import { fromNodeHeaders } from "better-auth/node";
-import { HttpUnauthorizedError } from "../lib/http-errors.js";
+import { HttpUnauthorizedError } from "@/lib/http-errors";
 
 const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
 if (!session) throw new HttpUnauthorizedError();

@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
 import { Role } from "@expense-tracker/core";
-import { HttpForbiddenError } from "../lib/http-errors.js";
+import { HttpForbiddenError } from "@/lib/http-errors";
 
 /**
  * Middleware factory that restricts a route to users holding one of the given roles.

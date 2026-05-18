@@ -65,6 +65,7 @@ COPY --from=stage /app/frontend/dist ./frontend/dist
 
 # Backend TypeScript source (Bun executes TS directly — no compile needed)
 COPY backend/src            ./backend/src
+COPY backend/tsconfig.json  ./backend/tsconfig.json
 COPY backend/prisma         ./backend/prisma
 COPY backend/prisma.config.ts ./backend/prisma.config.ts
 

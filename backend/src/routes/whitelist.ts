@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { getPrisma } from "../lib/prisma.js";
-import { validate } from "../lib/validate.js";
+import { getPrisma } from "@/lib/prisma";
+import { validate } from "@/lib/validate";
 import { CreateWhitelistEntrySchema, SortDir } from "@expense-tracker/core";
-import { HttpNotFoundError, HttpConflictError } from "../lib/http-errors.js";
+import { HttpNotFoundError, HttpConflictError } from "@/lib/http-errors";
 
 const router = Router();
 const prisma = getPrisma();

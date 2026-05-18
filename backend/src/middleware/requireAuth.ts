@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { fromNodeHeaders } from "better-auth/node";
-import { auth } from "../lib/auth.js";
-import { HttpUnauthorizedError } from "../lib/http-errors.js";
+import { auth } from "@/lib/auth";
+import { HttpUnauthorizedError } from "@/lib/http-errors";
 
 export async function requireAuth(
   req: Request,

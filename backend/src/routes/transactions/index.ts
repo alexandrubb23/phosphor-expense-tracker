@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { getPrisma } from "../../lib/prisma.js";
-import { validate } from "../../lib/validate.js";
+import { getPrisma } from "@/lib/prisma";
+import { validate } from "@/lib/validate";
 import {
   CreateTransactionSchema,
   UpdateTransactionSchema,
@@ -11,8 +11,8 @@ import {
   SummaryPeriod,
   type SummaryPeriod as SummaryPeriodType,
 } from "@expense-tracker/core";
-import { HttpNotFoundError } from "../../lib/http-errors.js";
-import { AI_USER_ID } from "../../lib/ai-user.js";
+import { HttpNotFoundError } from "@/lib/http-errors";
+import { AI_USER_ID } from "@/lib/ai-user";
 
 const router = Router();
 const prisma = getPrisma();

@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { env } from "../env.js";
+import { env } from "@/env";
 
 // Lazy-loaded after `bunx prisma generate` produces the client.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

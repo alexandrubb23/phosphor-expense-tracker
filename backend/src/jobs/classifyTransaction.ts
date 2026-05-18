@@ -1,7 +1,7 @@
 import type PgBoss from "pg-boss";
-import { getPrisma } from "../lib/prisma.js";
-import { extractTransaction } from "../lib/extractTransaction.js";
-import { AI_USER_ID } from "../lib/ai-user.js";
+import { getPrisma } from "@/lib/prisma";
+import { extractTransaction } from "@/lib/extractTransaction";
+import { AI_USER_ID } from "@/lib/ai-user";
 import {
   TransactionStatus,
   Confidence,

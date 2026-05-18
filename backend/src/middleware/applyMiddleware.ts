@@ -3,8 +3,8 @@ import cors from "cors";
 import type { Application } from "express";
 import express from "express";
 import helmet from "helmet";
-import { env } from "../env.js";
-import { auth } from "../lib/auth.js";
+import { env } from "@/env";
+import { auth } from "@/lib/auth";
 
 export function applyMiddleware(app: Application): void {
   app.use(helmet());
