@@ -26,7 +26,7 @@ type EditFields = TransactionFormFields;
 const inputClass = (invalid: boolean) =>
   [
     "w-full bg-panel px-4 py-3 font-mono text-sm tracking-[0.02em] text-ink transition-colors duration-200",
-    "focus:bg-panel-raised focus:outline-none focus:shadow-[inset_0_0_0_1px_#00e5ff]",
+    "focus:bg-panel-raised focus:outline-none focus:shadow-[inset_0_0_0_1px_var(--color-purple)]",
     "placeholder:text-[11px] placeholder:tracking-[0.15em] placeholder:text-muted",
     invalid
       ? "bg-[rgba(255,58,92,0.06)] text-red shadow-[inset_0_0_0_1px_#ff3a5c]"
@@ -36,16 +36,16 @@ const inputClass = (invalid: boolean) =>
     .join(" ");
 
 const selectClass =
-  "w-full cursor-pointer appearance-none bg-panel px-4 py-3 pr-10 font-mono text-[11px] uppercase tracking-[0.12em] text-ink transition-colors duration-200 focus:bg-panel-raised focus:outline-none focus:shadow-[inset_0_0_0_1px_#00e5ff]";
+  "w-full cursor-pointer appearance-none bg-panel px-4 py-3 pr-10 font-mono text-[11px] uppercase tracking-[0.12em] text-ink transition-colors duration-200 focus:bg-panel-raised focus:outline-none focus:shadow-[inset_0_0_0_1px_var(--color-purple)]";
 
 const labelClass =
-  "block font-mono text-[10px] uppercase tracking-[0.22em] text-cyan mb-1.5";
+  "block font-mono text-[10px] uppercase tracking-[0.22em] text-purple mb-1.5";
 
 function SelectWrapper({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative bg-panel">
       {children}
-      <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-cyan text-xs">
+      <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-purple text-xs">
         ⌄
       </span>
     </div>
@@ -95,10 +95,10 @@ export default function EditTransactionModal({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-lg rounded-none border border-hairline-glow bg-surface p-8 shadow-[0_0_60px_rgba(0,229,255,0.08)]">
+      <DialogContent className="max-w-lg rounded-none border border-hairline-glow bg-surface p-8 shadow-[0_0_60px_var(--accent-glow-08)]">
         {/* Corner accents */}
-        <span className="pointer-events-none absolute -top-px -left-px h-3 w-3 border-t border-l border-cyan" />
-        <span className="pointer-events-none absolute -right-px -bottom-px h-3 w-3 border-b border-r border-cyan" />
+        <span className="pointer-events-none absolute -top-px -left-px h-3 w-3 border-t border-l border-purple" />
+        <span className="pointer-events-none absolute -right-px -bottom-px h-3 w-3 border-b border-r border-purple" />
 
         <DialogHeader className="mb-6 flex flex-row items-center justify-between gap-0 place-items-start text-left">
           <DialogTitle className="font-mono text-[13px] font-medium uppercase tracking-[0.22em] text-ink">
@@ -108,7 +108,7 @@ export default function EditTransactionModal({
             variant="ghost"
             size="sm"
             disabled={isSubmitting}
-            className="h-auto p-0 font-mono text-[11px] tracking-[0.2em] text-muted hover:bg-transparent hover:text-cyan"
+            className="h-auto p-0 font-mono text-[11px] tracking-[0.2em] text-muted hover:bg-transparent hover:text-purple"
           >
             ✕ CLOSE
           </DialogClose>
@@ -208,14 +208,14 @@ export default function EditTransactionModal({
           <div className="mt-2 flex gap-3">
             <DialogClose
               disabled={isSubmitting}
-              className="flex-1 rounded-none border border-hairline bg-transparent py-3 font-mono text-[11px] uppercase tracking-[0.28em] text-muted hover:border-cyan hover:bg-transparent hover:text-cyan disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex-1 rounded-none border border-hairline bg-transparent py-3 font-mono text-[11px] uppercase tracking-[0.28em] text-muted hover:border-purple hover:bg-transparent hover:text-purple disabled:cursor-not-allowed disabled:opacity-50"
             >
               CANCEL
             </DialogClose>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 bg-cyan py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-bg-deep transition-all duration-200 hover:bg-cyan-bright disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex-1 bg-purple py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-bg-deep transition-all duration-200 hover:bg-purple-bright disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? "SAVING…" : "▸ Save"}
             </button>

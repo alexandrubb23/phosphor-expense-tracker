@@ -14,11 +14,11 @@ export default function UserListSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <Table className="border-collapse border border-hairline bg-panel">
       <TableHeader>
-        <TableRow className="border-b border-cyan-dim bg-surface hover:bg-surface">
+        <TableRow className="border-b border-purple-dim bg-surface hover:bg-surface">
           {["ID", "NAME", "EMAIL", "ROLE", "VERIFIED", "JOINED"].map((col) => (
             <TableHead
               key={col}
-              className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan"
+              className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-purple"
             >
               {col}
             </TableHead>

@@ -39,7 +39,7 @@ function SelectWrapper({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative w-full bg-surface">
       {children}
-      <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-cyan">
+      <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-purple">
         ⌄
       </span>
     </div>
@@ -84,10 +84,10 @@ export default function TransactionForm() {
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
-        className="relative grid grid-cols-[2.4fr_1fr_1fr_1fr_1fr_auto] gap-px border border-hairline-glow bg-hairline transition-all duration-300 focus-within:border-cyan focus-within:shadow-[0_0_0_1px_#0098b5,0_0_32px_rgba(0,229,255,0.08)] max-sm:grid-cols-[1fr_1fr]"
+        className="relative grid grid-cols-[2.4fr_1fr_1fr_1fr_1fr_auto] gap-px border border-hairline-glow bg-hairline transition-all duration-300 focus-within:border-purple focus-within:shadow-[0_0_0_1px_var(--accent-ring),0_0_32px_var(--accent-glow-08)] max-sm:grid-cols-[1fr_1fr]"
       >
-        <span className="pointer-events-none absolute -top-0.5 -left-0.5 h-2.5 w-2.5 border border-cyan border-r-0 border-b-0 opacity-0 transition-opacity duration-300 focus-within:opacity-100" />
-        <span className="pointer-events-none absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 border border-cyan border-l-0 border-t-0 opacity-0 transition-opacity duration-300 focus-within:opacity-100" />
+        <span className="pointer-events-none absolute -top-0.5 -left-0.5 h-2.5 w-2.5 border border-purple border-r-0 border-b-0 opacity-0 transition-opacity duration-300 focus-within:opacity-100" />
+        <span className="pointer-events-none absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 border border-purple border-l-0 border-t-0 opacity-0 transition-opacity duration-300 focus-within:opacity-100" />
 
         {/* Hidden fields */}
         <input type="hidden" {...register("currency")} />
@@ -144,7 +144,7 @@ export default function TransactionForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="whitespace-nowrap bg-cyan px-9 py-5 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-bg-deep transition-all duration-200 hover:bg-cyan-bright hover:tracking-[0.34em] hover:shadow-[0_0_36px_rgba(0,229,255,0.5),inset_0_0_16px_rgba(255,255,255,0.3)] active:bg-cyan-dim disabled:cursor-not-allowed disabled:opacity-50 max-sm:col-span-full"
+          className="whitespace-nowrap bg-purple px-9 py-5 font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-bg-deep transition-all duration-200 hover:bg-purple-bright hover:tracking-[0.34em] hover:shadow-[0_0_36px_var(--accent-glow-50),inset_0_0_16px_rgba(255,255,255,0.3)] active:bg-purple-dim disabled:cursor-not-allowed disabled:opacity-50 max-sm:col-span-full"
         >
           {isSubmitting ? "TRANSMITTING…" : "▸ Transmit"}
         </button>

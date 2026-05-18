@@ -74,15 +74,15 @@ export default function UserFormModal({ user, onClose }: UserFormModalProps) {
       role="presentation"
     >
       <div
-        className="relative w-full max-w-md border border-hairline-glow bg-surface p-8 shadow-[0_0_60px_rgba(0,229,255,0.08)]"
+        className="relative w-full max-w-md border border-hairline-glow bg-surface p-8 shadow-[0_0_60px_var(--accent-glow-08)]"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="user-form-title"
       >
         {/* Corner accents */}
-        <span className="pointer-events-none absolute -top-px -left-px h-3 w-3 border-t border-l border-cyan" />
-        <span className="pointer-events-none absolute -right-px -bottom-px h-3 w-3 border-b border-r border-cyan" />
+        <span className="pointer-events-none absolute -top-px -left-px h-3 w-3 border-t border-l border-purple" />
+        <span className="pointer-events-none absolute -right-px -bottom-px h-3 w-3 border-b border-r border-purple" />
 
         <div className="mb-6 flex items-center justify-between">
           <h2
@@ -94,7 +94,7 @@ export default function UserFormModal({ user, onClose }: UserFormModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="font-mono text-[11px] tracking-[0.2em] text-muted transition-colors duration-200 hover:text-cyan"
+            className="font-mono text-[11px] tracking-[0.2em] text-muted transition-colors duration-200 hover:text-purple"
             aria-label="Close"
           >
             ✕ CLOSE
@@ -142,8 +142,8 @@ export default function UserFormModal({ user, onClose }: UserFormModalProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mt-2 w-full rounded-none bg-cyan py-4 font-mono text-[11px] font-semibold uppercase tracking-[0.32em] text-bg-deep transition-all duration-200
-                hover:bg-cyan-bright hover:tracking-[0.38em] hover:shadow-[0_0_36px_rgba(0,229,255,0.5),inset_0_0_16px_rgba(255,255,255,0.3)]
+              className="mt-2 w-full rounded-none bg-purple py-4 font-mono text-[11px] font-semibold uppercase tracking-[0.32em] text-bg-deep transition-all duration-200
+                hover:bg-purple-bright hover:tracking-[0.38em] hover:shadow-[0_0_36px_var(--accent-glow-50),inset_0_0_16px_rgba(255,255,255,0.3)]
                 disabled:cursor-not-allowed disabled:opacity-50 disabled:tracking-[0.2em]"
             >
               {isSubmitting

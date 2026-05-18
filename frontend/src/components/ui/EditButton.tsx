@@ -11,7 +11,7 @@ export default function EditButton({ label, onClick }: EditButtonProps) {
       type="button"
       onClick={onClick}
       aria-label={`Edit ${label}`}
-      className="text-muted transition-colors duration-200 hover:text-cyan"
+      className="text-muted transition-colors duration-200 hover:text-purple"
     >
       <Pencil size={14} />
     </button>

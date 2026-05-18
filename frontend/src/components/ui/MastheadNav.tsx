@@ -23,23 +23,23 @@ const BurgerButton = forwardRef<HTMLButtonElement, BurgerButtonProps>(
     return (
       <button
         ref={ref}
-        className="sm:hidden flex h-7 w-7 flex-col items-center justify-center gap-[4.5px] border border-hairline-glow bg-transparent transition-colors duration-200 hover:border-cyan"
+        className="sm:hidden flex h-7 w-7 flex-col items-center justify-center gap-[4.5px] border border-hairline-glow bg-transparent transition-colors duration-200 hover:border-purple"
         onClick={onToggle}
         aria-label={isOpen ? "Close menu" : "Open menu"}
         aria-expanded={isOpen}
       >
         <span
-          className={`block h-px w-3.5 origin-center bg-cyan transition-all duration-200 ${
+          className={`block h-px w-3.5 origin-center bg-purple transition-all duration-200 ${
             isOpen ? "translate-y-1.25 rotate-45" : ""
           }`}
         />
         <span
-          className={`block h-px w-3.5 bg-cyan transition-all duration-200 ${
+          className={`block h-px w-3.5 bg-purple transition-all duration-200 ${
             isOpen ? "scale-x-0 opacity-0" : ""
           }`}
         />
         <span
-          className={`block h-px w-3.5 origin-center bg-cyan transition-all duration-200 ${
+          className={`block h-px w-3.5 origin-center bg-purple transition-all duration-200 ${
             isOpen ? "-translate-y-1.25 -rotate-45" : ""
           }`}
         />

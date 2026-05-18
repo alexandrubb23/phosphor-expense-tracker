@@ -7,14 +7,14 @@ export default function LoginPage() {
       <Masthead sectorLabel="ACCESS PORTAL" sectorAccent="AUTH REQUIRED" />
 
       <div className="flex items-center justify-center py-10 pb-20">
-        <div className="relative w-full max-w-120 border border-hairline-glow bg-panel bg-gradient-to-b from-[rgba(0,229,255,0.02)] to-transparent px-12 py-11">
-          <span className="pointer-events-none absolute -top-0.5 -left-0.5 h-4.5 w-4.5 border-2 border-cyan border-r-0 border-b-0" />
-          <span className="pointer-events-none absolute -top-0.5 -right-0.5 h-4.5 w-4.5 border-2 border-cyan border-l-0 border-b-0" />
-          <span className="pointer-events-none absolute -bottom-0.5 -left-0.5 h-4.5 w-4.5 border-2 border-cyan border-r-0 border-t-0" />
-          <span className="pointer-events-none absolute -right-0.5 -bottom-0.5 h-4.5 w-4.5 border-2 border-cyan border-l-0 border-t-0" />
+        <div className="relative w-full max-w-120 border border-hairline-glow bg-panel bg-gradient-to-b from-[var(--accent-glow-02)] to-transparent px-12 py-11">
+          <span className="pointer-events-none absolute -top-0.5 -left-0.5 h-4.5 w-4.5 border-2 border-purple border-r-0 border-b-0" />
+          <span className="pointer-events-none absolute -top-0.5 -right-0.5 h-4.5 w-4.5 border-2 border-purple border-l-0 border-b-0" />
+          <span className="pointer-events-none absolute -bottom-0.5 -left-0.5 h-4.5 w-4.5 border-2 border-purple border-r-0 border-t-0" />
+          <span className="pointer-events-none absolute -right-0.5 -bottom-0.5 h-4.5 w-4.5 border-2 border-purple border-l-0 border-t-0" />
 
           <div className="mb-7 flex items-center justify-between">
-            <span className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-cyan">
+            <span className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-purple">
               OPERATOR ACCESS
             </span>
             <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted">

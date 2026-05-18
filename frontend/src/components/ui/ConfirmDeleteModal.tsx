@@ -44,7 +44,7 @@ export default function ConfirmDeleteModal({
 
   return (
     <AlertDialog open onOpenChange={(open) => !open && onClose()}>
-      <AlertDialogContent className="max-w-md rounded-none border border-hairline-glow bg-surface p-8 shadow-[0_0_60px_rgba(0,229,255,0.08)]">
+      <AlertDialogContent className="max-w-md rounded-none border border-hairline-glow bg-surface p-8 shadow-[0_0_60px_var(--accent-glow-08)]">
         {/* Corner accents */}
         <span className="pointer-events-none absolute -top-px -left-px h-3 w-3 border-t border-l border-red" />
         <span className="pointer-events-none absolute -right-px -bottom-px h-3 w-3 border-b border-r border-red" />
@@ -57,7 +57,7 @@ export default function ConfirmDeleteModal({
             variant="ghost"
             size="sm"
             disabled={isPending}
-            className="h-auto p-0 font-mono text-[11px] tracking-[0.2em] text-muted hover:bg-transparent hover:text-cyan"
+            className="h-auto p-0 font-mono text-[11px] tracking-[0.2em] text-muted hover:bg-transparent hover:text-purple"
           >
             ✕ CLOSE
           </AlertDialogCancel>
@@ -80,7 +80,7 @@ export default function ConfirmDeleteModal({
         <AlertDialogFooter className="mx-0 mb-0 mt-6 flex-row rounded-none border-0 bg-transparent p-0">
           <AlertDialogCancel
             disabled={isPending}
-            className="flex-1 rounded-none border border-hairline bg-transparent py-3 font-mono text-[11px] uppercase tracking-[0.28em] text-muted hover:border-cyan hover:bg-transparent hover:text-cyan disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 rounded-none border border-hairline bg-transparent py-3 font-mono text-[11px] uppercase tracking-[0.28em] text-muted hover:border-purple hover:bg-transparent hover:text-purple disabled:cursor-not-allowed disabled:opacity-50"
           >
             CANCEL
           </AlertDialogCancel>

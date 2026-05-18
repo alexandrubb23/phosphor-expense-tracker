@@ -23,12 +23,12 @@ export function CustomTooltip({
   if (!active || !payload?.length) return null;
   const entry = payload[0];
   return (
-    <div className="relative border border-cyan-dim bg-bg px-4 py-3 font-mono text-xs text-ink shadow-[0_12px_32px_rgba(0,0,0,0.6),0_0_24px_rgba(0,229,255,0.08)]">
-      <span className="absolute -top-px -left-px h-1.5 w-1.5 bg-cyan" />
+    <div className="relative border border-purple-dim bg-bg px-4 py-3 font-mono text-xs text-ink shadow-[0_12px_32px_rgba(0,0,0,0.6),0_0_24px_var(--accent-glow-08)]">
+      <span className="absolute -top-px -left-px h-1.5 w-1.5 bg-purple" />
       <div className="mb-1.5 text-[9px] uppercase tracking-[0.22em] text-muted">
         ▸ {entry.payload.name}
       </div>
-      <div className="text-[15px] font-medium text-cyan">
+      <div className="text-[15px] font-medium text-purple">
         {formatCurrency(entry.value)}
       </div>
     </div>

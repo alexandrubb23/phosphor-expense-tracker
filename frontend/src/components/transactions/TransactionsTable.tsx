@@ -13,6 +13,7 @@ import {
 } from "@expense-tracker/core";
 import { useCallback, useMemo, useState } from "react";
 import { CATEGORY_COLORS } from "../../categoryColors";
+import { Palette } from "@/lib/palette";
 import { Transaction } from "../../api/transactions";
 import {
   useTransactions,
@@ -26,9 +27,9 @@ import { formatTime } from "@/lib/time";
 
 function SortIcon({ isSorted }: { isSorted: false | SortDir }) {
   if (isSorted === SortDir.asc)
-    return <span className="ml-1.5 text-cyan">▲</span>;
+    return <span className="ml-1.5 text-purple">▲</span>;
   if (isSorted === SortDir.desc)
-    return <span className="ml-1.5 text-cyan">▼</span>;
+    return <span className="ml-1.5 text-purple">▼</span>;
   return <span className="ml-1.5 text-muted opacity-40">⇅</span>;
 }
 
@@ -127,7 +128,7 @@ function TransactionsTable() {
             <span className="inline-flex items-center gap-2 border border-hairline-glow bg-surface px-2.5 py-1 pl-2">
               <span
                 className="h-1.5 w-1.5 shrink-0 rounded-full"
-                style={{ background: CATEGORY_COLORS[cat] ?? "#5a7080" }}
+                style={{ background: CATEGORY_COLORS[cat] ?? Palette.Muted }}
               />
               {cat}
             </span>
@@ -173,7 +174,7 @@ function TransactionsTable() {
           return (
             <div className="flex items-center justify-end gap-1.5">
               <button
-                className="inline-flex h-6.5 w-6.5 items-center justify-center border border-hairline-glow bg-transparent font-mono text-[13px] leading-none text-muted transition-all duration-200 hover:border-cyan hover:bg-cyan hover:text-bg-deep hover:shadow-[0_0_16px_rgba(0,229,255,0.5)]"
+                className="inline-flex h-6.5 w-6.5 items-center justify-center border border-hairline-glow bg-transparent font-mono text-[13px] leading-none text-muted transition-all duration-200 hover:border-purple hover:bg-purple hover:text-bg-deep hover:shadow-[0_0_16px_var(--accent-glow-50)]"
                 onClick={() => handleEdit(t)}
                 aria-label={`Edit ${t.description}`}
                 title="Edit"
@@ -222,7 +223,7 @@ function TransactionsTable() {
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr
                     key={headerGroup.id}
-                    className="border-b border-cyan-dim bg-surface"
+                    className="border-b border-purple-dim bg-surface"
                   >
                     {headerGroup.headers.map((header) => {
                       const canSort = header.column.getCanSort();
@@ -233,7 +234,7 @@ function TransactionsTable() {
                         <th
                           key={header.id}
                           className={[
-                            "px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan",
+                            "px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-purple",
                             isAmountCol || isActionsCol
                               ? "text-right"
                               : "text-left",
@@ -347,7 +348,7 @@ function TransactionsTable() {
               <button
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
-                className="flex h-7 w-7 items-center justify-center border border-hairline-glow bg-panel font-mono text-xs text-ink transition-colors hover:border-cyan-dim hover:text-cyan disabled:cursor-not-allowed disabled:opacity-30"
+                className="flex h-7 w-7 items-center justify-center border border-hairline-glow bg-panel font-mono text-xs text-ink transition-colors hover:border-purple-dim hover:text-purple disabled:cursor-not-allowed disabled:opacity-30"
                 aria-label="Previous page"
               >
                 ‹
@@ -355,7 +356,7 @@ function TransactionsTable() {
               <button
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
-                className="flex h-7 w-7 items-center justify-center border border-hairline-glow bg-panel font-mono text-xs text-ink transition-colors hover:border-cyan-dim hover:text-cyan disabled:cursor-not-allowed disabled:opacity-30"
+                className="flex h-7 w-7 items-center justify-center border border-hairline-glow bg-panel font-mono text-xs text-ink transition-colors hover:border-purple-dim hover:text-purple disabled:cursor-not-allowed disabled:opacity-30"
                 aria-label="Next page"
               >
                 ›

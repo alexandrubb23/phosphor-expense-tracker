@@ -13,6 +13,7 @@ import {
   type ChartEntry,
 } from "./spendingCategoryChartUtils";
 import { formatCurrency } from "@/lib/currency";
+import { Palette } from "@/lib/palette";
 
 interface Props {
   data: ChartEntry[];
@@ -29,12 +30,12 @@ export default function SpendingByCategoryDesktopChart({ data }: Props) {
       >
         <CartesianGrid
           vertical={false}
-          stroke="#1a2535"
+          stroke={Palette.Hairline}
           strokeDasharray="2 6"
         />
         <XAxis
           dataKey="name"
-          axisLine={{ stroke: "#2a4055", strokeWidth: 1 }}
+          axisLine={{ stroke: Palette.HairlineGlow, strokeWidth: 1 }}
           tickLine={false}
           interval={0}
           tick={{ dy: 6, fontSize: 9, angle: -35, textAnchor: "end" }}
@@ -50,7 +51,7 @@ export default function SpendingByCategoryDesktopChart({ data }: Props) {
         />
         <Tooltip
           content={<CustomTooltip />}
-          cursor={{ fill: "rgba(0, 229, 255, 0.05)" }}
+          cursor={{ fill: "var(--accent-glow-08)" }}
         />
         <Bar
           dataKey="value"

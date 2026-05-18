@@ -23,7 +23,7 @@ export default function SummaryPeriodSelector() {
 
   return (
     <div className="mb-6 flex flex-wrap items-center gap-3 border border-hairline bg-surface px-4.5 py-3 font-mono">
-      <span className="text-[10px] uppercase tracking-[0.28em] text-cyan">
+      <span className="text-[10px] uppercase tracking-[0.28em] text-purple">
         ▸ PERIOD
       </span>
       <div className="flex flex-wrap gap-1.5">
@@ -36,8 +36,8 @@ export default function SummaryPeriodSelector() {
               className={[
                 "px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] transition-colors duration-150",
                 active
-                  ? "border border-cyan bg-surface text-cyan"
-                  : "border border-hairline-glow bg-panel text-muted hover:border-cyan-dim hover:text-ink",
+                  ? "border border-purple bg-surface text-purple"
+                  : "border border-hairline-glow bg-panel text-muted hover:border-purple-dim hover:text-ink",
               ].join(" ")}
             >
               {PERIOD_LABELS[p]}
@@ -52,7 +52,7 @@ export default function SummaryPeriodSelector() {
             type="date"
             value={from ?? ""}
             onChange={(e) => setFrom(e.target.value || undefined)}
-            className="border border-hairline-glow bg-panel px-3 py-1 font-mono text-[11px] tracking-[0.06em] text-ink focus:border-cyan-dim focus:outline-none"
+            className="border border-hairline-glow bg-panel px-3 py-1 font-mono text-[11px] tracking-[0.06em] text-ink focus:border-purple-dim focus:outline-none"
             aria-label="From date"
           />
           <span className="text-[10px] tracking-[0.2em] text-muted">→</span>
@@ -60,7 +60,7 @@ export default function SummaryPeriodSelector() {
             type="date"
             value={to ?? ""}
             onChange={(e) => setTo(e.target.value || undefined)}
-            className="border border-hairline-glow bg-panel px-3 py-1 font-mono text-[11px] tracking-[0.06em] text-ink focus:border-cyan-dim focus:outline-none"
+            className="border border-hairline-glow bg-panel px-3 py-1 font-mono text-[11px] tracking-[0.06em] text-ink focus:border-purple-dim focus:outline-none"
             aria-label="To date"
           />
         </div>

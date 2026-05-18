@@ -23,14 +23,14 @@ function Summary() {
 
   return (
     <section className="mb-18 opacity-0 animate-fade-up [animation-delay:0.2s]">
-      <div className="relative border border-hairline-glow bg-panel bg-linear-to-b from-[rgba(0,229,255,0.02)] to-transparent px-12 py-11 max-sm:px-5.5 max-sm:py-7">
-        <span className="pointer-events-none absolute -top-0.5 -left-0.5 h-4.5 w-4.5 border-2 border-cyan border-r-0 border-b-0" />
-        <span className="pointer-events-none absolute -top-0.5 -right-0.5 h-4.5 w-4.5 border-2 border-cyan border-l-0 border-b-0" />
-        <span className="pointer-events-none absolute -bottom-0.5 -left-0.5 h-4.5 w-4.5 border-2 border-cyan border-r-0 border-t-0" />
-        <span className="pointer-events-none absolute -right-0.5 -bottom-0.5 h-4.5 w-4.5 border-2 border-cyan border-l-0 border-t-0" />
+      <div className="relative border border-hairline-glow bg-panel bg-linear-to-b from-[var(--accent-glow-02)] to-transparent px-12 py-11 max-sm:px-5.5 max-sm:py-7">
+        <span className="pointer-events-none absolute -top-0.5 -left-0.5 h-4.5 w-4.5 border-2 border-purple border-r-0 border-b-0" />
+        <span className="pointer-events-none absolute -top-0.5 -right-0.5 h-4.5 w-4.5 border-2 border-purple border-l-0 border-b-0" />
+        <span className="pointer-events-none absolute -bottom-0.5 -left-0.5 h-4.5 w-4.5 border-2 border-purple border-r-0 border-t-0" />
+        <span className="pointer-events-none absolute -right-0.5 -bottom-0.5 h-4.5 w-4.5 border-2 border-purple border-l-0 border-t-0" />
 
         <div className="mb-7 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.28em]">
-          <span className="flex items-center gap-2.5 text-cyan">
+          <span className="flex items-center gap-2.5 text-purple">
             <span className="text-[12px]">▸</span>
             {isNegative ? "NET / DEFICIT" : "NET / POSITION"}
           </span>
@@ -44,7 +44,7 @@ function Summary() {
             className="pointer-events-none absolute inset-0 animate-scan mix-blend-screen"
             style={{
               backgroundImage:
-                "linear-gradient(180deg, transparent 0%, transparent 45%, rgba(0,229,255,0.18) 50%, transparent 55%, transparent 100%)",
+                "linear-gradient(180deg, transparent 0%, transparent 45%, var(--accent-glow-18) 50%, transparent 55%, transparent 100%)",
             }}
           />
           <div
@@ -57,14 +57,14 @@ function Summary() {
             )}
             {fmt(animatedBalance)}
             <span
-              className={`mt-[0.22em] text-[0.42em] font-normal ${isNegative ? "text-red" : "text-cyan"}`}
+              className={`mt-[0.22em] text-[0.42em] font-normal ${isNegative ? "text-red" : "text-purple"}`}
             >
               {CURRENCY_CODE}
             </span>
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-px border-t border-cyan-dim bg-hairline max-sm:grid-cols-1">
+        <div className="mt-8 grid grid-cols-2 gap-px border-t border-purple-dim bg-hairline max-sm:grid-cols-1">
           <div className="relative flex flex-col gap-2.5 bg-panel px-5.5 py-5">
             <span className="absolute top-3.5 right-4.5 font-mono text-[9px] tracking-[0.24em] text-muted">
               CH·02

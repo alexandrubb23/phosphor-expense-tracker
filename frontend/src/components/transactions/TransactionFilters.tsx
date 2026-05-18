@@ -60,7 +60,7 @@ export default function TransactionFilters() {
 
   return (
     <div className="mb-6 flex flex-wrap items-center gap-4 border border-hairline bg-surface px-4.5 py-3.5 font-mono">
-      <span className="text-[10px] uppercase tracking-[0.28em] text-cyan">
+      <span className="text-[10px] uppercase tracking-[0.28em] text-purple">
         ▸ FILTER
       </span>
       <div className="relative">
@@ -69,7 +69,7 @@ export default function TransactionFilters() {
           placeholder="Search…"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-48 border border-hairline-glow bg-panel px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-ink placeholder:text-muted focus:outline-none focus:border-cyan-dim"
+          className="w-48 border border-hairline-glow bg-panel px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-ink placeholder:text-muted focus:outline-none focus:border-purple-dim"
         />
         {searchInput && (
           <button

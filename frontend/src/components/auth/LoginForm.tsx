@@ -79,8 +79,8 @@ export default function LoginForm() {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="mt-2 w-full rounded-none bg-cyan py-4 h-auto font-mono text-[11px] font-semibold uppercase tracking-[0.32em] text-bg-deep transition-all duration-200
-            hover:bg-cyan-bright hover:tracking-[0.38em] hover:shadow-[0_0_36px_rgba(0,229,255,0.5),inset_0_0_16px_rgba(255,255,255,0.3)]
+          className="mt-2 w-full rounded-none bg-purple py-4 h-auto font-mono text-[11px] font-semibold uppercase tracking-[0.32em] text-bg-deep transition-all duration-200
+            hover:bg-purple-bright hover:tracking-[0.38em] hover:shadow-[0_0_36px_var(--accent-glow-50),inset_0_0_16px_rgba(255,255,255,0.3)]
             disabled:cursor-not-allowed disabled:opacity-50 disabled:tracking-[0.2em]"
         >
           {isSubmitting ? "AUTHENTICATING…" : "AUTHENTICATE"}

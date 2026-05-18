@@ -20,10 +20,10 @@
   --color-ink-soft: #9aabb8;
   --color-muted: #5a7080;
   --color-muted-soft: #3a4858;
-  --color-cyan: #00e5ff;
-  --color-cyan-bright: #5cf3ff;
-  --color-cyan-dim: #0098b5;
-  --color-cyan-wash: rgba(0, 229, 255, 0.08);
+  --color-purple: #bf5fff;
+  --color-purple-bright: #d8a5ff;
+  --color-purple-dim: #8820cc;
+  --color-purple-wash: rgba(191, 95, 255, 0.08);
   --color-amber: #ffb84a;
   --color-red: #ff3a5c;
   --color-green: #4dffaa;
@@ -104,15 +104,15 @@
     pointer-events: none;
     z-index: 0;
     background:
-      radial-gradient(ellipse 80% 60% at 20% 0%, rgba(0, 229, 255, 0.08) 0%, transparent 55%),
-      radial-gradient(ellipse 60% 40% at 100% 50%, rgba(0, 152, 181, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 60% at 20% 0%, var(--accent-glow-08) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 40% at 100% 50%, var(--accent-glow-06) 0%, transparent 60%),
       radial-gradient(ellipse 70% 50% at 50% 100%, rgba(255, 58, 92, 0.05) 0%, transparent 55%);
   }
 
   html.light body::before {
     background:
-      radial-gradient(ellipse 80% 60% at 20% 0%, rgba(0, 140, 200, 0.06) 0%, transparent 55%),
-      radial-gradient(ellipse 60% 40% at 100% 50%, rgba(0, 120, 160, 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 60% at 20% 0%, var(--accent-glow-06) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 40% at 100% 50%, var(--accent-glow-04) 0%, transparent 60%),
       radial-gradient(ellipse 70% 50% at 50% 100%, rgba(200, 40, 80, 0.04) 0%, transparent 55%);
   }
 
@@ -126,7 +126,7 @@
       to bottom,
       transparent 0px,
       transparent 2px,
-      rgba(0, 229, 255, 0.025) 3px,
+      var(--accent-glow-02) 3px,
       transparent 4px
     );
     mix-blend-mode: screen;
@@ -142,7 +142,7 @@
   }
 
   ::selection {
-    background: #00e5ff;
+    background: var(--color-purple);
     color: #010204;
   }
 
@@ -297,13 +297,21 @@ html.light {
   --color-ink-soft: #4a6278;
   --color-muted: #6a8298;
   --color-muted-soft: #d8e4ef;
-  --color-cyan: #0284c7;
-  --color-cyan-bright: #0ea5e9;
-  --color-cyan-dim: #0369a1;
-  --color-cyan-wash: rgba(2, 132, 199, 0.08);
+  --color-purple: #7c3aed;
+  --color-purple-bright: #8b5cf6;
+  --color-purple-dim: #6d28d9;
+  --color-purple-wash: rgba(124, 58, 237, 0.08);
   --color-amber: #d97706;
   --color-red: #e11d48;
   --color-green: #059669;
+  --accent-glow-02: rgba(124, 58, 237, 0.02);
+  --accent-glow-04: rgba(124, 58, 237, 0.04);
+  --accent-glow-06: rgba(124, 58, 237, 0.06);
+  --accent-glow-08: rgba(124, 58, 237, 0.08);
+  --accent-glow-18: rgba(124, 58, 237, 0.18);
+  --accent-glow-30: rgba(124, 58, 237, 0.30);
+  --accent-glow-50: rgba(124, 58, 237, 0.50);
+  --accent-ring: #6d28d9;
 
   /* shadcn semantic tokens */
   --background: oklch(0.975 0.004 240);
@@ -328,4 +336,108 @@ html.light {
   --sidebar-foreground: oklch(0.2 0.02 240);
   --sidebar-border: oklch(0.88 0.01 240);
   --sidebar-ring: oklch(0.55 0.1 240);
+}
+
+/* ─── Accent glow variables (dark / default) ───────────────────────────────── */
+:root {
+  --accent-glow-02: rgba(191, 95, 255, 0.02);
+  --accent-glow-04: rgba(191, 95, 255, 0.04);
+  --accent-glow-06: rgba(191, 95, 255, 0.06);
+  --accent-glow-08: rgba(191, 95, 255, 0.08);
+  --accent-glow-18: rgba(191, 95, 255, 0.18);
+  --accent-glow-30: rgba(191, 95, 255, 0.30);
+  --accent-glow-50: rgba(191, 95, 255, 0.50);
+  --accent-ring: #8820cc;
+}
+
+/* ─── Accent color themes ───────────────────────────────────────────────────── */
+
+/* Cyan */
+html[data-accent="cyan"] {
+  --color-purple: #00e5ff;
+  --color-purple-bright: #5cf3ff;
+  --color-purple-dim: #0098b5;
+  --color-purple-wash: rgba(0, 229, 255, 0.08);
+  --accent-glow-02: rgba(0, 229, 255, 0.02);
+  --accent-glow-04: rgba(0, 229, 255, 0.04);
+  --accent-glow-06: rgba(0, 229, 255, 0.06);
+  --accent-glow-08: rgba(0, 229, 255, 0.08);
+  --accent-glow-18: rgba(0, 229, 255, 0.18);
+  --accent-glow-30: rgba(0, 229, 255, 0.30);
+  --accent-glow-50: rgba(0, 229, 255, 0.50);
+  --accent-ring: #0098b5;
+}
+html.light[data-accent="cyan"] {
+  --color-purple: #0284c7;
+  --color-purple-bright: #0ea5e9;
+  --color-purple-dim: #0369a1;
+  --color-purple-wash: rgba(2, 132, 199, 0.08);
+  --accent-glow-02: rgba(2, 132, 199, 0.02);
+  --accent-glow-04: rgba(2, 132, 199, 0.04);
+  --accent-glow-06: rgba(2, 132, 199, 0.06);
+  --accent-glow-08: rgba(2, 132, 199, 0.08);
+  --accent-glow-18: rgba(2, 132, 199, 0.18);
+  --accent-glow-30: rgba(2, 132, 199, 0.30);
+  --accent-glow-50: rgba(2, 132, 199, 0.50);
+  --accent-ring: #0369a1;
+}
+
+/* Amber */
+html[data-accent="amber"] {
+  --color-purple: #ffb84a;
+  --color-purple-bright: #ffd080;
+  --color-purple-dim: #c87820;
+  --color-purple-wash: rgba(255, 184, 74, 0.08);
+  --accent-glow-02: rgba(255, 184, 74, 0.02);
+  --accent-glow-04: rgba(255, 184, 74, 0.04);
+  --accent-glow-06: rgba(255, 184, 74, 0.06);
+  --accent-glow-08: rgba(255, 184, 74, 0.08);
+  --accent-glow-18: rgba(255, 184, 74, 0.18);
+  --accent-glow-30: rgba(255, 184, 74, 0.30);
+  --accent-glow-50: rgba(255, 184, 74, 0.50);
+  --accent-ring: #c87820;
+}
+html.light[data-accent="amber"] {
+  --color-purple: #d97706;
+  --color-purple-bright: #f59e0b;
+  --color-purple-dim: #b45309;
+  --color-purple-wash: rgba(217, 119, 6, 0.08);
+  --accent-glow-02: rgba(217, 119, 6, 0.02);
+  --accent-glow-04: rgba(217, 119, 6, 0.04);
+  --accent-glow-06: rgba(217, 119, 6, 0.06);
+  --accent-glow-08: rgba(217, 119, 6, 0.08);
+  --accent-glow-18: rgba(217, 119, 6, 0.18);
+  --accent-glow-30: rgba(217, 119, 6, 0.30);
+  --accent-glow-50: rgba(217, 119, 6, 0.50);
+  --accent-ring: #b45309;
+}
+
+/* Green */
+html[data-accent="green"] {
+  --color-purple: #4dffaa;
+  --color-purple-bright: #a5ffd0;
+  --color-purple-dim: #22cc70;
+  --color-purple-wash: rgba(77, 255, 170, 0.08);
+  --accent-glow-02: rgba(77, 255, 170, 0.02);
+  --accent-glow-04: rgba(77, 255, 170, 0.04);
+  --accent-glow-06: rgba(77, 255, 170, 0.06);
+  --accent-glow-08: rgba(77, 255, 170, 0.08);
+  --accent-glow-18: rgba(77, 255, 170, 0.18);
+  --accent-glow-30: rgba(77, 255, 170, 0.30);
+  --accent-glow-50: rgba(77, 255, 170, 0.50);
+  --accent-ring: #22cc70;
+}
+html.light[data-accent="green"] {
+  --color-purple: #059669;
+  --color-purple-bright: #10b981;
+  --color-purple-dim: #047857;
+  --color-purple-wash: rgba(5, 150, 105, 0.08);
+  --accent-glow-02: rgba(5, 150, 105, 0.02);
+  --accent-glow-04: rgba(5, 150, 105, 0.04);
+  --accent-glow-06: rgba(5, 150, 105, 0.06);
+  --accent-glow-08: rgba(5, 150, 105, 0.08);
+  --accent-glow-18: rgba(5, 150, 105, 0.18);
+  --accent-glow-30: rgba(5, 150, 105, 0.30);
+  --accent-glow-50: rgba(5, 150, 105, 0.50);
+  --accent-ring: #047857;
 }

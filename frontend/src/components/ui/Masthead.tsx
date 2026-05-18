@@ -1,6 +1,7 @@
 import Clock from "./Clock";
 import { DesktopNav, MobileMenu } from "./MastheadNav";
 import ThemeToggle from "./ThemeToggle";
+import AccentColorSwitcher from "./AccentColorSwitcher";
 
 interface MastheadProps {
   sectorLabel: string;
@@ -18,12 +19,12 @@ export default function Masthead({
 
   return (
     <header className="relative mb-14 flex items-center justify-between rounded-xs border border-hairline bg-surface px-4.5 py-3.5 opacity-0 animate-fade-in [animation-delay:0.05s] max-sm:flex-col max-sm:items-start max-sm:gap-2.5">
-      <span className="absolute -top-px -left-px h-2 w-2 bg-cyan shadow-[0_0_12px_rgba(0,229,255,0.5)]" />
-      <span className="absolute -right-px -bottom-px h-2 w-2 bg-cyan shadow-[0_0_12px_rgba(0,229,255,0.5)]" />
+      <span className="absolute -top-px -left-px h-2 w-2 bg-purple shadow-[0_0_12px_var(--accent-glow-50)]" />
+      <span className="absolute -right-px -bottom-px h-2 w-2 bg-purple shadow-[0_0_12px_var(--accent-glow-50)]" />
 
       <div className="flex items-center gap-5.5 font-mono text-[11px] uppercase tracking-[0.14em]">
-        <span className="relative flex items-center border border-cyan-dim px-2.25 py-1 font-medium text-cyan">
-          <span className="absolute top-1/2 -left-2 h-1.25 w-1.25 -translate-y-1/2 rounded-full bg-cyan shadow-[0_0_8px_rgba(0,229,255,0.5)] animate-blink" />
+        <span className="relative flex items-center border border-purple-dim px-2.25 py-1 font-medium text-purple">
+          <span className="absolute top-1/2 -left-2 h-1.25 w-1.25 -translate-y-1/2 rounded-full bg-purple shadow-[0_0_8px_var(--accent-glow-50)] animate-blink" />
           BR-04
         </span>
         <span className="flex items-center gap-2 text-ink-soft">
@@ -41,10 +42,11 @@ export default function Masthead({
         }
       >
         <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted">
-          {sectorLabel} <span className="text-cyan">// {sectorAccent}</span> ·{" "}
+          {sectorLabel} <span className="text-purple">// {sectorAccent}</span> ·{" "}
           {starDate}
         </div>
 
+        <AccentColorSwitcher />
         <ThemeToggle />
 
         {actions && <DesktopNav>{actions}</DesktopNav>}

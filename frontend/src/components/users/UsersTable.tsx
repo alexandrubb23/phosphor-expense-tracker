@@ -37,26 +37,26 @@ export default function UsersTable({
   return (
     <Table className="border-collapse border border-hairline bg-panel">
       <TableHeader>
-        <TableRow className="border-b border-cyan-dim bg-surface hover:bg-surface">
-          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan">
+        <TableRow className="border-b border-purple-dim bg-surface hover:bg-surface">
+          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-purple">
             ID
           </TableHead>
-          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan">
+          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-purple">
             NAME
           </TableHead>
-          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan">
+          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-purple">
             EMAIL
           </TableHead>
-          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan">
+          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-purple">
             ROLE
           </TableHead>
-          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan">
+          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-purple">
             VERIFIED
           </TableHead>
-          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan">
+          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-purple">
             JOINED
           </TableHead>
-          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-cyan">
+          <TableHead className="px-4.5 py-3.5 font-mono text-[10px] font-medium uppercase tracking-[0.24em] text-purple">
             ACTIONS
           </TableHead>
         </TableRow>
@@ -80,14 +80,14 @@ export default function UsersTable({
               <span
                 className={`inline-flex items-center gap-1.5 border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em] ${
                   user.role === Role.admin
-                    ? "border-cyan-dim bg-surface text-cyan"
+                    ? "border-purple-dim bg-surface text-purple"
                     : "border-hairline bg-surface text-muted"
                 }`}
               >
                 <span
                   className={`h-1.5 w-1.5 shrink-0 rounded-full ${
                     user.role === Role.admin
-                      ? "bg-cyan shadow-[0_0_6px_rgba(0,229,255,0.5)]"
+                      ? "bg-purple shadow-[0_0_6px_var(--accent-glow-50)]"
                       : "bg-muted"
                   }`}
                 />

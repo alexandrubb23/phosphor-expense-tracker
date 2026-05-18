@@ -52,7 +52,7 @@ describe("UserList", () => {
     );
     const badge = screen.getByText("admin");
     expect(badge).toBeInTheDocument();
-    expect(badge.closest("span")).toHaveClass("text-cyan");
+    expect(badge.closest("span")).toHaveClass("text-purple");
   });
 
   it("shows user role badge for regular users", () => {

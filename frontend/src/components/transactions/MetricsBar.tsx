@@ -1,6 +1,7 @@
 import { useTransactionSummary } from "../../hooks/useTransactions";
 import { useSummaryPeriod } from "../../context/SummaryPeriodContext";
 import { useCountUp } from "../../hooks/useCountUp";
+import { ThemeColor } from "@/lib/palette";
 
 function formatDuration(ms: number): string {
   if (ms <= 0) return "—";
@@ -18,20 +19,24 @@ interface MetricTileProps {
   channel: string;
   label: string;
   value: string;
-  accent?: "cyan" | "green" | "red" | "muted";
+  accent?:
+    | ThemeColor.Purple
+    | ThemeColor.Green
+    | ThemeColor.Red
+    | ThemeColor.Muted;
 }
 
 function MetricTile({
   channel,
   label,
   value,
-  accent = "cyan",
+  accent = ThemeColor.Purple,
 }: MetricTileProps) {
-  const colorMap = {
-    cyan: "text-cyan",
-    green: "text-green",
-    red: "text-red",
-    muted: "text-muted",
+  const colorMap: Record<string, string> = {
+    [ThemeColor.Purple]: "text-purple",
+    [ThemeColor.Green]: "text-green",
+    [ThemeColor.Red]: "text-red",
+    [ThemeColor.Muted]: "text-muted",
   };
 
   return (
@@ -74,37 +79,37 @@ function MetricsBar() {
         channel="M·01"
         label="Total Transactions"
         value={Math.round(animatedTotal).toLocaleString()}
-        accent="cyan"
+        accent={ThemeColor.Purple}
       />
       <MetricTile
         channel="M·02"
         label="Income Transactions"
         value={Math.round(animatedInflow).toLocaleString()}
-        accent="green"
+        accent={ThemeColor.Green}
       />
       <MetricTile
         channel="M·03"
         label="Outcome Transactions"
         value={Math.round(animatedOutflow).toLocaleString()}
-        accent="red"
+        accent={ThemeColor.Red}
       />
       <MetricTile
         channel="M·04"
         label="Resolved by AI"
         value={Math.round(animatedAi).toLocaleString()}
-        accent="cyan"
+        accent={ThemeColor.Purple}
       />
       <MetricTile
         channel="M·05"
         label="AI Resolution Rate"
         value={`${Math.round(animatedPercent)}%`}
-        accent="cyan"
+        accent={ThemeColor.Purple}
       />
       <MetricTile
         channel="M·06"
         label="Avg Resolution Time"
         value={formatDuration(avgResolutionMs)}
-        accent="muted"
+        accent={ThemeColor.Muted}
       />
     </div>
   );

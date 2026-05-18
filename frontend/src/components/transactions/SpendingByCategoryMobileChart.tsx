@@ -13,6 +13,7 @@ import {
   type ChartEntry,
 } from "./spendingCategoryChartUtils";
 import { formatCurrency } from "@/lib/currency";
+import { Palette } from "@/lib/palette";
 
 interface Props {
   data: ChartEntry[];
@@ -30,7 +31,7 @@ export default function SpendingByCategoryMobileChart({ data }: Props) {
       >
         <CartesianGrid
           horizontal={false}
-          stroke="#1a2535"
+          stroke={Palette.Hairline}
           strokeDasharray="2 6"
         />
         <XAxis
@@ -51,7 +52,7 @@ export default function SpendingByCategoryMobileChart({ data }: Props) {
         />
         <Tooltip
           content={<CustomTooltip />}
-          cursor={{ fill: "rgba(0, 229, 255, 0.05)" }}
+          cursor={{ fill: "var(--accent-glow-08)" }}
         />
         <Bar
           dataKey="value"
