@@ -23,7 +23,7 @@ import { useTransactionsFilter } from "../../context/TransactionsFilterContext";
 import ConfirmDeleteModal from "../ui/ConfirmDeleteModal";
 import EditTransactionModal from "./EditTransactionModal";
 import RefetchButton from "../ui/RefetchButton";
-import { formatTime } from "@/lib/time";
+import { formatTime, formatDateTime } from "@/lib/time";
 
 function SortIcon({ isSorted }: { isSorted: false | SortDir }) {
   if (isSorted === SortDir.asc)
@@ -43,12 +43,11 @@ const fmt = (n: number) =>
   });
 
 const shortId = (id: string) => `TX-${id.slice(-4).toUpperCase()}`;
-const formatDate = (iso: string) => iso.slice(0, 10);
 
 function TransactionsTable() {
   const { filter, pagination, setPagination } = useTransactionsFilter();
   const [sorting, setSorting] = useState<SortingState>([
-    { id: "date", desc: true },
+    { id: "createdAt", desc: true },
   ]);
 
   const sort = useMemo(
@@ -104,7 +103,7 @@ function TransactionsTable() {
         id: "date",
         header: "T·STAMP",
         enableSorting: true,
-        cell: (info) => formatDate(info.getValue()),
+        cell: (info) => formatDateTime(new Date(info.getValue())),
       }),
       columnHelper.accessor("createdAt", {
         id: "createdAt",

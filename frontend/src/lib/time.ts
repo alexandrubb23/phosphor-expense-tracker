@@ -8,6 +8,13 @@ const timeFormatter = new Intl.DateTimeFormat("en-GB", {
   hour12: false,
 });
 
+const dateFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: TIMEZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
 const tzAbbreviationFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: TIMEZONE,
   timeZoneName: "short",
@@ -19,4 +26,8 @@ const tzAbbreviation = tzAbbreviationFormatter
 
 export function formatTime(date: Date): string {
   return `${timeFormatter.format(date)} ${tzAbbreviation}`;
+}
+
+export function formatDateTime(date: Date): string {
+  return `${dateFormatter.format(date)} ${timeFormatter.format(date)}`;
 }
