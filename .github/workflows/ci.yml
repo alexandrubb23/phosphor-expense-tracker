@@ -74,6 +74,7 @@ jobs:
           TEST_USER_PASSWORD=${{ secrets.TEST_USER_PASSWORD }}
           OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
           DISABLE_AI=true
+          WEBHOOK_SECRET=${{ secrets.WEBHOOK_SECRET }}
           EOF
 
       - name: Run E2E tests
