@@ -50,13 +50,14 @@ export default function Masthead({
             · {starDate}
           </div>
 
-          <span className="max-sm:hidden">
-            <AccentColorSwitcher />
-          </span>
-          <ThemeToggle />
-
-          {actions && <DesktopNav>{actions}</DesktopNav>}
-          {actions && <MobileMenu>{actions}</MobileMenu>}
+          <div className="flex items-center gap-3">
+            <span className="max-sm:hidden">
+              <AccentColorSwitcher />
+            </span>
+            <ThemeToggle />
+            {actions && <DesktopNav>{actions}</DesktopNav>}
+            {actions && <MobileMenu>{actions}</MobileMenu>}
+          </div>
         </div>
       </header>
     </div>
