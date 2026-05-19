@@ -8,6 +8,7 @@
 @source "../index.html";
 
 @theme {
+  --breakpoint-sm: 740px;
   --color-bg: #03060a;
   --color-bg-deep: #010204;
   --color-surface: #0a1018;
