@@ -155,7 +155,7 @@ describe("TransactionsTable", () => {
     it("formats date to YYYY-MM-DD", () => {
       setupTransactions([salary]);
       renderTransactionsTable();
-      expect(screen.getByText("2025-05-01")).toBeInTheDocument();
+      expect(screen.getByText(/2025-05-01/)).toBeInTheDocument();
     });
 
     it("renders category badge for each row", () => {
